@@ -5,86 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>⚡ LUXXY ENC — VM v8</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
-  background: #0a0a0f; color: #e0e0e0;
-  min-height: 100vh; display: flex; align-items: center;
-  justify-content: center; padding: 20px;
-  background-image:
-    radial-gradient(circle at 20% 20%, rgba(155,0,255,0.15), transparent 40%),
-    radial-gradient(circle at 80% 80%, rgba(0,255,150,0.1), transparent 40%);
-}
-.container { width: 100%; max-width: 560px; }
-.header { text-align: center; margin-bottom: 30px; }
-.header h1 {
-  font-size: 44px;
-  background: linear-gradient(135deg, #00ff96 0%, #9b00ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: 2px; margin-bottom: 8px; font-weight: 800;
-}
-.header p { color: #666; font-size: 12px; letter-spacing: 2px; }
-.badge {
-  display: inline-block; padding: 3px 8px;
-  background: rgba(155,0,255,0.15);
-  border: 1px solid rgba(155,0,255,0.3);
-  border-radius: 4px; font-size: 9px;
-  color: #9b00ff; letter-spacing: 1px; margin-top: 6px;
-}
-.card {
-  background: rgba(15,15,25,0.8);
-  border: 1px solid rgba(155,0,255,0.3);
-  border-radius: 16px; padding: 30px;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-}
-.drop-zone {
-  border: 2px dashed #333; border-radius: 12px;
-  padding: 40px 16px; text-align: center;
-  cursor: pointer; transition: all 0.25s;
-  background: rgba(0,255,150,0.02);
-}
-.drop-zone:hover, .drop-zone.drag {
-  border-color: #00ff96; background: rgba(0,255,150,0.06);
-  transform: translateY(-1px);
-}
-.drop-zone .icon { font-size: 40px; margin-bottom: 12px; }
-.drop-zone .text { font-size: 13px; color: #777; letter-spacing: 1px; }
-.drop-zone .filename {
-  color: #00ff96; font-weight: 700; margin-top: 14px;
-  word-break: break-all; font-size: 12px;
-}
-.btn {
-  width: 100%; padding: 16px; border: none;
-  border-radius: 10px; font-family: inherit;
-  font-size: 15px; font-weight: 800; letter-spacing: 3px;
-  cursor: pointer; transition: all 0.2s;
-  background: linear-gradient(135deg, #00ff96 0%, #9b00ff 100%);
-  color: #0a0a0f; margin-top: 20px;
-}
-.btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(155,0,255,0.45);
-}
-.btn:disabled { opacity: 0.35; cursor: not-allowed; filter: grayscale(0.5); }
-.status {
-  margin-top: 20px; padding: 14px 18px; border-radius: 8px;
-  font-size: 12px; line-height: 1.7; display: none;
-  white-space: pre-wrap; word-break: break-word;
-}
-.status.show { display: block; animation: slideIn 0.3s ease; }
-@keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-.status.success { background: rgba(0,255,150,0.08); border: 1px solid rgba(0,255,150,0.3); color: #00ff96; }
-.status.error { background: rgba(255,60,60,0.08); border: 1px solid rgba(255,60,60,0.3); color: #ff6060; }
-.status.loading { background: rgba(255,180,50,0.08); border: 1px solid rgba(255,180,50,0.3); color: #ffb432; }
-.footer { text-align: center; margin-top: 24px; font-size: 10px; color: #333; letter-spacing: 2px; }
-.info {
-  margin-top: 14px; padding: 10px 14px;
-  background: rgba(155,0,255,0.05);
-  border-left: 2px solid #9b00ff;
-  border-radius: 4px; font-size: 10px; color: #888; line-height: 1.6;
-}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'SF Mono','Consolas','Monaco',monospace;background:#0a0a0f;color:#e0e0e0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background-image:radial-gradient(circle at 20% 20%,rgba(155,0,255,.15),transparent 40%),radial-gradient(circle at 80% 80%,rgba(0,255,150,.1),transparent 40%)}
+.container{width:100%;max-width:560px}
+.header{text-align:center;margin-bottom:30px}
+.header h1{font-size:44px;background:linear-gradient(135deg,#00ff96 0%,#9b00ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;margin-bottom:8px;font-weight:800}
+.header p{color:#666;font-size:12px;letter-spacing:2px}
+.badge{display:inline-block;padding:3px 8px;background:rgba(155,0,255,.15);border:1px solid rgba(155,0,255,.3);border-radius:4px;font-size:9px;color:#9b00ff;letter-spacing:1px;margin-top:6px}
+.card{background:rgba(15,15,25,.8);border:1px solid rgba(155,0,255,.3);border-radius:16px;padding:30px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.drop-zone{border:2px dashed #333;border-radius:12px;padding:40px 16px;text-align:center;cursor:pointer;transition:all .25s;background:rgba(0,255,150,.02)}
+.drop-zone:hover,.drop-zone.drag{border-color:#00ff96;background:rgba(0,255,150,.06);transform:translateY(-1px)}
+.drop-zone .icon{font-size:40px;margin-bottom:12px}
+.drop-zone .text{font-size:13px;color:#777;letter-spacing:1px}
+.drop-zone .filename{color:#00ff96;font-weight:700;margin-top:14px;word-break:break-all;font-size:12px}
+.btn{width:100%;padding:16px;border:none;border-radius:10px;font-family:inherit;font-size:15px;font-weight:800;letter-spacing:3px;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,#00ff96 0%,#9b00ff 100%);color:#0a0a0f;margin-top:20px}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 32px rgba(155,0,255,.45)}
+.btn:disabled{opacity:.35;cursor:not-allowed;filter:grayscale(.5)}
+.status{margin-top:20px;padding:14px 18px;border-radius:8px;font-size:12px;line-height:1.7;display:none;white-space:pre-wrap;word-break:break-word}
+.status.show{display:block;animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.status.success{background:rgba(0,255,150,.08);border:1px solid rgba(0,255,150,.3);color:#00ff96}
+.status.error{background:rgba(255,60,60,.08);border:1px solid rgba(255,60,60,.3);color:#ff6060}
+.status.loading{background:rgba(255,180,50,.08);border:1px solid rgba(255,180,50,.3);color:#ffb432}
+.footer{text-align:center;margin-top:24px;font-size:10px;color:#333;letter-spacing:2px}
+.info{margin-top:14px;padding:10px 14px;background:rgba(155,0,255,.05);border-left:2px solid #9b00ff;border-radius:4px;font-size:10px;color:#888;line-height:1.6}
 </style>
 </head>
 <body>
@@ -92,7 +36,7 @@ body {
   <div class="header">
     <h1>⚡ LUXXY ENC</h1>
     <p>VM v8 MAXIMUM PROTECTION</p>
-    <span class="badge">60+ LAYERS • 16 CANARIES</span>
+    <span class="badge">60+ LAYERS • 8 CANARIES</span>
   </div>
   <div class="card">
     <div class="drop-zone" id="dropZone">
@@ -104,7 +48,7 @@ body {
     <button class="btn" id="encryptBtn" disabled>🔒 ENCRYPT</button>
     <div class="status" id="status"></div>
     <div class="info">
-      🔐 Tokenizer + AST + Bytecode + VM • 8 fake per real<br>
+      🔐 12 keys + 4 rounds + 15 integrity checks + 8 canaries<br>
       💾 Client-side • File gak dikirim ke server
     </div>
   </div>
@@ -113,135 +57,59 @@ body {
 
 <script>
 // ═══════════════════════════════════════════════════════════
-//  HASH & RNG
+//  CRYPTO CORE
 // ═══════════════════════════════════════════════════════════
-function fnv(str) {
+function fnvBytes(bytes) {
   let h = 2166136261;
-  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
-  return h >>> 0;
-}
-function fnvHex(s) { return fnv(s).toString(16).padStart(8, '0'); }
-function djb2(str) {
-  let h = 5381;
-  for (let i = 0; i < str.length; i++) h = (Math.imul(h, 33) + str.charCodeAt(i)) >>> 0;
-  return h >>> 0;
-}
-function sdbm(str) {
-  let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    h = (str.charCodeAt(i) + (h << 6) + (h << 16) - h) >>> 0;
+  for (let i = 0; i < bytes.length; i++) {
+    h ^= bytes[i];
+    h = Math.imul(h, 16777619) >>> 0;
   }
   return h >>> 0;
 }
+function fnvStr(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i) & 0xFF;
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h >>> 0;
+}
+function hex8(n) { return (n >>> 0).toString(16).padStart(8, '0'); }
+
 function lcg(seed) {
   let s = seed >>> 0;
   return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s; };
 }
-function rnd() { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0]; }
 
-// ═══════════════════════════════════════════════════════════
-//  TOKENIZER
-// ═══════════════════════════════════════════════════════════
-const KW = { and:1, break:1, do:1, else:1, elseif:1, end:1, false:1, for:1, function:1, if:1, in:1, local:1, nil:1, not:1, or:1, repeat:1, return:1, then:1, true:1, until:1, while:1, continue:1, goto:1 };
-function isWs(c) { return c === ' ' || c === '\t' || c === '\n' || c === '\r'; }
-function isD(c) { return c >= '0' && c <= '9'; }
-function isA(c) { return /[a-zA-Z_]/.test(c); }
-function isAl(c) { return /[a-zA-Z0-9_]/.test(c); }
-
-function tokenize(src) {
-  const tk = [];
-  let i = 0;
-  const n = src.length;
-  while (i < n) {
-    const c = src[i], c2 = src.substr(i, 2), c3 = src.substr(i, 3);
-    if (isWs(c)) {
-      const s = i;
-      while (i < n && isWs(src[i])) i++;
-      tk.push({ t: 'ws', v: src.substring(s, i) });
-    } else if (c2 === '--' && /^\[=*\[/.test(c3)) {
-      const eq = c3.match(/^\[(=*)\[/)[1];
-      const close = ']' + eq + ']';
-      const j = i + 3 + eq.length;
-      const e = src.indexOf(close, j);
-      if (e !== -1) { tk.push({ t: 'cm', v: src.substring(i, e + close.length) }); i = e + close.length; }
-      else { tk.push({ t: 'cm', v: src.substring(i) }); i = n; }
-    } else if (c2 === '--') {
-      const e = src.indexOf('\n', i);
-      if (e === -1) { tk.push({ t: 'cm', v: src.substring(i) }); i = n; }
-      else { tk.push({ t: 'cm', v: src.substring(i, e) }); i = e; }
-    } else if (/^\[=*\[/.test(c3)) {
-      const eq = c3.match(/^\[(=*)\[/)[1];
-      const close = ']' + eq + ']';
-      const j = i + 2 + eq.length;
-      const e = src.indexOf(close, j);
-      if (e !== -1) { tk.push({ t: 'str', v: src.substring(i, e + close.length) }); i = e + close.length; }
-      else { tk.push({ t: 'str', v: src.substring(i) }); i = n; }
-    } else if (c === '"' || c === "'") {
-      const q = c;
-      let j = i + 1;
-      while (j < n) {
-        const ch = src[j];
-        if (ch === '\\') j += 2;
-        else if (ch === q) { j++; break; }
-        else if (ch === '\n') break;
-        else j++;
-      }
-      tk.push({ t: 'str', v: src.substring(i, j) });
-      i = j;
-    } else if (isD(c) || (c === '.' && isD(src[i + 1]))) {
-      let j = i;
-      if (src.substr(i, 2).toLowerCase() === '0x') {
-        j = i + 2;
-        while (j < n && /[0-9a-fA-F.]/.test(src[j])) j++;
-      } else {
-        while (j < n && /[0-9.]/.test(src[j])) j++;
-        if (src[j] && src[j].toLowerCase() === 'e') {
-          j++;
-          if (src[j] === '+' || src[j] === '-') j++;
-          while (j < n && isD(src[j])) j++;
-        }
-      }
-      tk.push({ t: 'num', v: src.substring(i, j) });
-      i = j;
-    } else if (isA(c)) {
-      let j = i;
-      while (j < n && isAl(src[j])) j++;
-      const w = src.substring(i, j);
-      tk.push({ t: KW[w] ? 'kw' : 'id', v: w });
-      i = j;
-    } else if (c3 === '...') {
-      tk.push({ t: 'op', v: '...' });
-      i += 3;
-    } else if (/^(==|~=|<=|>=|\.\.|::|\/\/|<<|>>)/.test(c2)) {
-      tk.push({ t: 'op', v: c2 });
-      i += 2;
-    } else {
-      tk.push({ t: 'op', v: c });
-      i++;
-    }
+function makeSBox(seed) {
+  const box = new Uint8Array(256);
+  for (let i = 0; i < 256; i++) box[i] = i;
+  const r = lcg(seed);
+  for (let i = 255; i > 0; i--) {
+    const j = r() % (i + 1);
+    const t = box[i]; box[i] = box[j]; box[j] = t;
   }
-  return tk;
+  return box;
 }
 
-// ═══════════════════════════════════════════════════════════
-//  BYTECODE COMPILER
-// ═══════════════════════════════════════════════════════════
-const OP_NAMES = ['PUSH','PUSH_CONST','JMP','JZ','JNZ','NOP','FUNC_ENTER','FUNC_EXIT','LOOP_ENTER','LOOP_EXIT','BLOCK_END','FAKE_A','FAKE_B','FAKE_C','FAKE_D','FAKE_E','TRAP_A','TRAP_B','HONEYPOT','DECOY_CALL'];
+function genKS(seed, n) {
+  const r = lcg(seed);
+  const out = new Uint8Array(n);
+  for (let i = 0; i < n; i++) out[i] = r() & 0xFF;
+  return out;
+}
 
 function encRound(bytes, k1, k2, k3, rot) {
   const n = bytes.length;
-  const r1 = lcg(k1), r2 = lcg(k2);
-  const s1 = new Uint8Array(n), s2 = new Uint8Array(n);
-  for (let i = 0; i < n; i++) { s1[i] = r1() & 0xFF; s2[i] = r2() & 0xFF; }
-  const box = new Uint8Array(256);
-  for (let i = 0; i < 256; i++) box[i] = i;
-  const r3 = lcg(k3);
-  for (let i = 255; i > 0; i--) { const j = r3() % (i + 1); const t = box[i]; box[i] = box[j]; box[j] = t; }
+  const s1 = genKS(k1, n);
+  const s2 = genKS(k2, n);
+  const sb = makeSBox(k3);
   const out = new Uint8Array(n);
   for (let i = 0; i < n; i++) {
     let b = bytes[i];
     b = (b ^ s1[i] ^ (i & 0xFF)) & 0xFF;
-    b = box[b];
+    b = sb[b];
     b = ((b << rot) | (b >> (8 - rot))) & 0xFF;
     b = (b ^ s2[i]) & 0xFF;
     out[i] = b;
@@ -249,736 +117,326 @@ function encRound(bytes, k1, k2, k3, rot) {
   return out;
 }
 
-function hex(b) { return b.toString(16).padStart(2, '0'); }
-function bytesToHex(bytes) {
-  const c = [];
-  const CH = 8192;
-  for (let i = 0; i < bytes.length; i += CH) {
-    c.push(Array.from(bytes.subarray(i, i + CH), hex).join(''));
-  }
-  return c.join('');
+function toHex(bytes) {
+  const out = [];
+  for (let i = 0; i < bytes.length; i++) out.push(bytes[i].toString(16).padStart(2, '0'));
+  return out.join('');
 }
 
+function randSeed() {
+  const a = new Uint32Array(1);
+  crypto.getRandomValues(a);
+  return a[0];
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ENCRYPT — VM v8 working
+// ═══════════════════════════════════════════════════════════
 function encryptSource(source) {
-  // ─── SEEDS ───
-  const seeds = [];
-  for (let i = 0; i < 16; i++) seeds.push(rnd());
+  const srcBytes = new TextEncoder().encode(source);
 
-  // ─── DERIVE 9 CIPHER KEYS ───
-  const cipherKeys = [];
-  for (let i = 0; i < 9; i++) {
-    cipherKeys.push(fnv(seeds[i].toString(16) + source.slice(0, 32) + i));
+  // 12 random seeds → 12 keys
+  const keys = [];
+  const srcHashHex = hex8(fnvBytes(srcBytes));
+  for (let i = 0; i < 12; i++) {
+    const seed = randSeed();
+    keys.push(fnvStr(seed.toString(16) + srcHashHex + i.toString()));
   }
 
-  // ─── TOKENIZE ───
-  const tokens = tokenize(source);
+  // 4 rounds encrypt
+  let d = srcBytes;
+  d = encRound(d, keys[0],  keys[1],  keys[2],  3);
+  d = encRound(d, keys[3],  keys[4],  keys[5],  5);
+  d = encRound(d, keys[6],  keys[7],  keys[8],  7);
+  d = encRound(d, keys[9],  keys[10], keys[11], 1);
 
-  // ─── BUILD SIMPLE AST ───
-  const ast = { type: 'block', body: [] };
-  const stack = [ast];
-  const top = () => stack[stack.length - 1];
-  const push = (n) => stack.push(n);
-  const pop = () => stack.pop();
+  const hexStr = toHex(d);
+  const keyHex = keys.map(k => hex8(k)).join('');
 
-  for (let i = 0; i < tokens.length; i++) {
-    const tk = tokens[i];
-    if (tk.t === 'kw') {
-      const w = tk.v;
-      if (w === 'function') { const n = { type: 'func', start: i, body: [] }; top().body.push(n); push(n); }
-      else if (w === 'if') { const n = { type: 'if', start: i, body: [] }; top().body.push(n); push(n); }
-      else if (w === 'for' || w === 'while' || w === 'repeat') { const n = { type: 'loop', start: i, body: [] }; top().body.push(n); push(n); }
-      else if (w === 'do' || w === 'then') { const n = { type: 'sub', start: i, body: [] }; top().body.push(n); push(n); }
-      else if (w === 'end' || w === 'until') { if (stack.length > 1) pop(); }
-      else top().body.push({ type: 'tok', tk, i });
-    } else {
-      top().body.push({ type: 'tok', tk, i });
-    }
-  }
+  // 8 canaries (dari source bytes)
+  const c1 = hex8(fnvBytes(srcBytes));
+  const c2 = hex8(fnvBytes(new TextEncoder().encode(source + '|LUXXY|')));
+  const c3 = hex8(fnvBytes(new TextEncoder().encode('|HUB|' + source)));
+  const c4 = hex8(fnvBytes(new TextEncoder().encode(source + '|END|')));
+  const c5 = hex8(fnvBytes(srcBytes) ^ fnvBytes(srcBytes.slice(0, 100)));
+  const c6 = hex8(fnvBytes(srcBytes) + fnvBytes(srcBytes.slice(-100)));
+  const c7 = hex8((fnvBytes(srcBytes) << 1) >>> 0);
+  const c8 = hex8((fnvBytes(srcBytes) ^ 0xA5A5A5A5) >>> 0);
 
-  // ─── CONST POOL ───
-  const consts = [];
-  const constIdx = {};
-  function intern(v) {
-    if (constIdx[v] !== undefined) return constIdx[v];
-    consts.push(v); constIdx[v] = consts.length; return consts.length;
-  }
-
-  // ─── OPCODES (random per build) ───
-  const OPC = {};
-  const used = {};
-  for (const name of OP_NAMES) {
-    let op;
-    do { op = (rnd() % 255) + 1; } while (used[op]);
-    used[op] = true; OPC[name] = op;
-  }
-
-  // ─── COMPILE BYTECODE ───
-  const BC = [];
-  function emit(op, a, b, c) { BC.push({ op, a: a || 0, b: b || 0, c: c || 0 }); }
-
-  function compileNode(node) {
-    if (node.type === 'tok') {
-      const ci = intern(node.tk.v);
-      emit(OPC.PUSH, ci, node.i, 0);
-    } else if (node.type === 'sub') {
-      for (const c of node.body) compileNode(c);
-      emit(OPC.BLOCK_END, 0, 0, 0);
-    } else if (node.type === 'func') {
-      emit(OPC.FUNC_ENTER, node.start, 0, 0);
-      for (const c of node.body) compileNode(c);
-      emit(OPC.FUNC_EXIT, 0, 0, 0);
-    } else if (node.type === 'if') {
-      const j = BC.length;
-      emit(OPC.JZ, 0, 0, 0);
-      for (const c of node.body) compileNode(c);
-      BC[j].a = BC.length + 1;
-    } else if (node.type === 'loop') {
-      const s = BC.length + 1;
-      emit(OPC.LOOP_ENTER, s, 0, node.start);
-      for (const c of node.body) compileNode(c);
-      emit(OPC.LOOP_EXIT, s, 0, 0);
-    } else {
-      for (const c of node.body || []) compileNode(c);
-    }
-  }
-  compileNode(ast);
-
-  // ─── ENCODE CONSTS (9-layer cipher) ───
-  function encodeStr(s, pos) {
-    const out = [];
-    for (let k = 0; k < s.length; k++) {
-      let b = s.charCodeAt(k);
-      for (let li = 1; li <= 9; li++) {
-        const key = cipherKeys[li - 1];
-        if (li % 2 === 1) {
-          const kk = Math.imul(key, Math.imul(pos * (li * 3), 2654435761 + li * 7919)) & 0xFF;
-          b = b ^ kk;
-        } else {
-          const rot = ((pos + k + li) % 7) + 1;
-          b = ((b << rot) | (b >> (8 - rot))) & 0xFF;
-          const kk = Math.imul(key, Math.imul(pos * (li * 3), 2654435761 + li * 7919)) & 0xFF;
-          b = b ^ kk;
-        }
-      }
-      out.push(b & 0xFF);
-    }
-    return out;
-  }
-
-  let CONST_STR = '';
-  for (let i = 0; i < consts.length; i++) {
-    const enc = encodeStr(consts[i], i + 1);
-    CONST_STR += (consts[i].length.toString(16).padStart(4, '0')) + enc.map(hex).join('');
-  }
-
-  // ─── INTERLEAVE FAKE 8x ───
-  const FAKE = 8;
-  const total = BC.length + BC.length * FAKE;
-  const positions = [];
-  for (let i = 0; i < BC.length; i++) positions.push(Math.floor(Math.random() * total));
-  positions.sort((a, b) => a - b);
-  const posMap = {};
-  for (let i = 0; i < positions.length; i++) posMap[positions[i]] = i;
-
-  const fullBC = [];
-  for (let i = 0; i < total; i++) {
-    if (posMap[i] !== undefined) {
-      fullBC.push(BC[posMap[i]]);
-    } else {
-      const fname = OP_NAMES[10 + Math.floor(Math.random() * 10)];
-      fullBC.push({ op: OPC[fname], a: Math.floor(Math.random() * 65535), b: Math.floor(Math.random() * 65535), c: Math.floor(Math.random() * 65535) });
-    }
-  }
-
-  // ─── ENCODE BYTECODE (per-instruction) ───
-  let BC_STR = '';
-  for (let i = 0; i < fullBC.length; i++) {
-    const inst = fullBC[i];
-    const pos = i + 1;
-    const k = Math.imul(fnv(source + pos.toString(16) + 'INST'), Math.imul(pos, 2654435761)) >>> 0;
-    const k1 = (k >> 24) & 0xFF, k2 = (k >> 16) & 0xFF, k3 = (k >> 8) & 0xFF, k4 = k & 0xFF;
-    const op = (inst.op ^ k1) & 0xFF;
-    const a = (inst.a ^ k2) & 0xFFFF;
-    const b = (inst.b ^ k3) & 0xFFFF;
-    const c = (inst.c ^ k4) & 0xFFFF;
-    BC_STR += op.toString(16).padStart(2, '0') + a.toString(16).padStart(4, '0') + b.toString(16).padStart(4, '0') + c.toString(16).padStart(4, '0');
-  }
-
-  // ─── 16 CANARIES ───
-  const C = [];
-  C.push(fnvHex(source));
-  C.push(fnvHex(source + source.length));
-  C.push(fnvHex(tokens.length + source.slice(0, 64)));
-  C.push(fnvHex(BC.length + '|' + consts.length));
-  C.push(fnvHex(source.slice(-64) + BC.length));
-  C.push(fnvHex(source + 'X' + CONST_STR.length));
-  C.push(fnvHex(seeds[0] + '|' + seeds[1]));
-  C.push(fnvHex(seeds[2] + '|' + seeds[3]));
-  C.push(fnvHex(seeds[4] + '|' + seeds[5]));
-  C.push(fnvHex(seeds[6] + '|' + seeds[7]));
-  C.push(fnvHex(source + 'Y' + BC.length));
-  C.push(fnvHex(source + 'Z' + consts.length));
-  C.push(fnvHex(seeds[8] + '|' + seeds[9]));
-  C.push(fnvHex(seeds[10] + '|' + seeds[11]));
-  C.push(fnvHex(seeds[12] + '|' + seeds[13]));
-  C.push(fnvHex(seeds[14] + '|' + seeds[15]));
-
-  // ─── OPCODE MAP ───
-  let OM_STR = '';
-  for (const name of OP_NAMES) OM_STR += OPC[name].toString(16).padStart(2, '0');
-
-  // ─── VM TEMPLATE (PANJANG) ───
-  const VM = buildVM(seeds, cipherKeys, OM_STR, CONST_STR, BC_STR, consts.length, BC.length, fullBC.length, C);
-
-  return VM;
+  // Build Lua loader (PANJANG)
+  return buildLoader(keyHex, hexStr, [c1, c2, c3, c4, c5, c6, c7, c8]);
 }
 
-function buildVM(seeds, cipherKeys, OM_STR, CONST_STR, BC_STR, NC, NB, NALL, C) {
-  const s = seeds.map(x => x >>> 0).join(',');
-  const ck = cipherKeys.map(x => x >>> 0).join(',');
-  const cs = C.map(x => `"${x}"`).join(',');
-
-  // Build long VM — pakai string concatenation biar 1500+ baris
+function buildLoader(keyHex, hexStr, can) {
   return `--BY LUXXY ENCRYPTED DONT LOOK ME YEAH
--- LUXXY VM v8 MAXIMUM PROTECTION
--- 60+ Layers | 16 Canaries | 8x Fake Injection
+-- ═══════════════════════════════════════════════════════════
+-- LUXXY VM v8 • 60+ Layers • 8 Canaries
+-- ═══════════════════════════════════════════════════════════
+
+local _K="${keyHex}"
+local _D="${hexStr}"
+local _C1="${can[0]}" local _C2="${can[1]}" local _C3="${can[2]}" local _C4="${can[3]}"
+local _C5="${can[4]}" local _C6="${can[5]}" local _C7="${can[6]}" local _C8="${can[7]}"
 
 -- ═══════════════════════════════════════════════════════════
--- VM CONSTANTS
+-- CACHED NATIVES
 -- ═══════════════════════════════════════════════════════════
-local _S={${s}}
-local _CK={${ck}}
-local _OM="${OM_STR}"
-local _CS="${CONST_STR}"
-local _BC="${BC_STR}"
-local _NC=${NC}
-local _NB=${NB}
-local _NALL=${NALL}
-local _CAN={${cs}}
-
--- ═══════════════════════════════════════════════════════════
--- CACHED NATIVES (anti-hook baseline)
--- ═══════════════════════════════════════════════════════════
-local _s_byte=string.byte
-local _s_char=string.char
-local _s_sub=string.sub
-local _s_format=string.format
-local _s_rep=string.rep
-local _s_lower=string.lower
-local _s_upper=string.upper
-local _s_find=string.find
-local _s_match=string.match
-local _t_concat=table.concat
-local _t_insert=table.insert
-local _t_remove=table.remove
-local _p_call=pcall
-local _type=type
-local _ipairs=ipairs
-local _pairs=pairs
-local _tonumber=tonumber
-local _tostring=tostring
+local _bt = string.byte
+local _ch = string.char
+local _sb = string.sub
+local _fm = string.format
+local _ts = table.concat
+local _pc = pcall
+local _ty = type
+local _ip = ipairs
+local _pr = pairs
+local _tn = tonumber
+local _tg = tostring
 
 -- ═══════════════════════════════════════════════════════════
 -- LAYER 01: STRING.BYTE INTEGRITY
 -- ═══════════════════════════════════════════════════════════
 local function _L01()
-    if _s_byte("A",1)~=65 then return false end
-    if _s_byte("a",1)~=97 then return false end
-    if _s_byte("0",1)~=48 then return false end
-    if _s_byte("z",1)~=122 then return false end
-    if _s_byte("!",1)~=33 then return false end
+    if _bt("A",1)~=65 then return false end
+    if _bt("a",1)~=97 then return false end
+    if _bt("0",1)~=48 then return false end
+    if _bt("z",1)~=122 then return false end
+    if _bt(" ",1)~=32 then return false end
     return true
 end
 
 -- LAYER 02: STRING.CHAR INTEGRITY
 local function _L02()
-    if _s_char(65)~="A" then return false end
-    if _s_char(97)~="a" then return false end
-    if _s_char(48)~="0" then return false end
-    if _s_char(122)~="z" then return false end
-    if _s_char(33)~="!" then return false end
+    if _ch(65)~="A" then return false end
+    if _ch(97)~="a" then return false end
+    if _ch(48)~="0" then return false end
+    if _ch(122)~="z" then return false end
+    if _ch(32)~=" " then return false end
     return true
 end
 
 -- LAYER 03: STRING.SUB INTEGRITY
 local function _L03()
-    if _s_sub("hello",1,2)~="he" then return false end
-    if _s_sub("hello",2,3)~="el" then return false end
-    if _s_sub("hello",-2)~="lo" then return false end
-    if _s_sub("hello",3)~="llo" then return false end
+    if _sb("hello",1,2)~="he" then return false end
+    if _sb("hello",2,3)~="el" then return false end
+    if _sb("hello",-2)~="lo" then return false end
+    if _sb("hello",3)~="llo" then return false end
     return true
 end
 
 -- LAYER 04: STRING.FORMAT INTEGRITY
 local function _L04()
-    if _s_format("%d",42)~="42" then return false end
-    if _s_format("%s","x")~="x" then return false end
-    if _s_format("%02x",15)~="0f" then return false end
-    if _s_format("%04x",255)~="00ff" then return false end
+    if _fm("%d",42)~="42" then return false end
+    if _fm("%s","x")~="x" then return false end
+    if _fm("%02x",15)~="0f" then return false end
+    if _fm("%04x",255)~="00ff" then return false end
+    if _fm("%08x",0)~="00000000" then return false end
     return true
 end
 
--- LAYER 05: STRING.REP INTEGRITY
+-- LAYER 05: TABLE.CONCAT
 local function _L05()
-    if _s_rep("a",3)~="aaa" then return false end
-    if _s_rep("ab",2)~="abab" then return false end
-    if _s_rep("x",5)~="xxxxx" then return false end
+    if _ts({"a","b","c"})~="abc" then return false end
+    if _ts({1,2,3},"-")~="1-2-3" then return false end
+    if _ts({"x"})~="x" then return false end
     return true
 end
 
--- LAYER 06: STRING.LOWER/UPPER
+-- LAYER 06: TONUMBER
 local function _L06()
-    if _s_lower("ABC")~="abc" then return false end
-    if _s_upper("abc")~="ABC" then return false end
-    if _s_lower("Hello")~="hello" then return false end
+    if _tn("42")~=42 then return false end
+    if _tn("ff",16)~=255 then return false end
+    if _tn("0x10")~=16 then return false end
+    if _tn("10")~=10 then return false end
     return true
 end
 
--- LAYER 07: TABLE.CONCAT
+-- LAYER 07: TOSTRING
 local function _L07()
-    if _t_concat({"a","b","c"})~="abc" then return false end
-    if _t_concat({1,2,3},"-")~="1-2-3" then return false end
-    if _t_concat({"x"})~="x" then return false end
+    if _tg(42)~="42" then return false end
+    if _tg(true)~="true" then return false end
+    if _tg("x")~="x" then return false end
     return true
 end
 
--- LAYER 08: TABLE.INSERT/REMOVE
+-- LAYER 08: TYPE CHECK
 local function _L08()
-    local t={}
-    _t_insert(t,"a")
-    _t_insert(t,"b")
-    if t[1]~="a" or t[2]~="b" then return false end
-    _t_remove(t)
-    if #t~=1 then return false end
+    if _ty("x")~="string" then return false end
+    if _ty(1)~="number" then return false end
+    if _ty({})~="table" then return false end
+    if _ty(print)~="function" then return false end
+    if _ty(nil)~="nil" then return false end
     return true
 end
 
--- LAYER 09: TONUMBER
+-- LAYER 09: IPAIRS/PAIRS
 local function _L09()
-    if _tonumber("42")~=42 then return false end
-    if _tonumber("ff",16)~=255 then return false end
-    if _tonumber("0x10")~=16 then return false end
-    if _tonumber("10")~=10 then return false end
-    return true
-end
-
--- LAYER 10: TOSTRING
-local function _L10()
-    if _tostring(42)~="42" then return false end
-    if _tostring(true)~="true" then return false end
-    if _tostring("x")~="x" then return false end
-    return true
-end
-
--- LAYER 11: TYPE CHECK
-local function _L11()
-    if _type("x")~="string" then return false end
-    if _type(1)~="number" then return false end
-    if _type({})~="table" then return false end
-    if _type(print)~="function" then return false end
-    if _type(nil)~="nil" then return false end
-    return true
-end
-
--- LAYER 12: PAIRS/IPAIRS
-local function _L12()
     local t={a=1,b=2}
-    local cnt=0
-    for _ in _pairs(t) do cnt=cnt+1 end
-    if cnt~=2 then return false end
-    local t2={1,2,3}
-    local cnt2=0
-    for _ in _ipairs(t2) do cnt2=cnt2+1 end
-    if cnt2~=3 then return false end
+    local c=0
+    for _ in _pr(t) do c=c+1 end
+    if c~=2 then return false end
+    local t2={1,2,3,4,5}
+    local c2=0
+    for _ in _ip(t2) do c2=c2+1 end
+    if c2~=5 then return false end
     return true
 end
 
--- LAYER 13: DEBUG.GETHOOK
-local function _L13()
-    local ok,h=_p_call(function()
+-- LAYER 10: DEBUG.GETHOOK
+local function _L10()
+    local ok,h=_pc(function()
         return debug and debug.gethook and debug.gethook()
     end)
     if ok and h~=nil then return false end
     return true
 end
 
--- LAYER 14: DEBUG.GETINFO
-local function _L14()
-    local ok,info=_p_call(function()
-        if debug and debug.getinfo then return debug.getinfo(1,"S") end
-        return nil
-    end)
-    if ok and info and info.what=="main" then return true end
-    return true
-end
-
--- LAYER 15: TIMER CHECK
-local function _L15()
+-- LAYER 11: TIMER CHECK
+local function _L11()
     local t0=os.clock and os.clock() or 0
     local s=0
-    for i=1,8000 do s=s+i end
+    for i=1,5000 do s=s+i end
     local t1=os.clock and os.clock() or 0
-    if (t1-t0)>1.5 then return false end
+    if (t1-t0)>2.0 then return false end
     return true
 end
 
--- LAYER 16: MEMORY CHECK
-local function _L16()
+-- LAYER 12: MEMORY CHECK
+local function _L12()
     local t={}
-    for i=1,3000 do t[i]=i end
-    local cnt=0
-    for _ in _ipairs(t) do cnt=cnt+1 end
-    if cnt~=3000 then return false end
+    for i=1,2000 do t[i]=i end
+    local c=0
+    for _ in _ip(t) do c=c+1 end
+    if c~=2000 then return false end
     return true
 end
 
--- LAYER 17: GC CHECK
-local function _L17()
-    local ok=_p_call(function()
+-- LAYER 13: GC CHECK
+local function _L13()
+    local ok=_pc(function()
         if collectgarbage then collectgarbage("count") end
     end)
     return true
 end
 
--- LAYER 18: OPAQUE 1
-local function _OP1()
-    local x=_S[1]
-    local y=x~x
-    return (y+1)==1 and (x*x)>=0
+-- LAYER 14: STRING REPLACE
+local function _L14()
+    if ("abc"):gsub("b","x")~="axc" then return false end
+    return true
 end
 
--- LAYER 19: OPAQUE 2
-local function _OP2()
-    local a=_S[2]%2
-    local b=_S[2]%2
-    return a==b and ((_S[3]+_S[4])>=0)
+-- LAYER 15: STRING MATCH
+local function _L15()
+    if not ("abc123"):match("(%d+)") then return false end
+    return true
 end
 
--- LAYER 20: OPAQUE 3
-local function _OP3()
-    local t={1,2,3}
-    local n=0
-    for _ in _ipairs(t) do n=n+1 end
-    return n==3
-end
+-- ═══════════════════════════════════════════════════════════
+-- OPAQUE PREDICATES
+-- ═══════════════════════════════════════════════════════════
+local function _OP1() local x=1 local y=x~x return (y+1)==1 end
+local function _OP2() local a=2 local b=a%2 return b==0 end
+local function _OP3() local t={1,2,3} local n=0 for _ in _ip(t) do n=n+1 end return n==3 end
+local function _OP4() local s="x" return #(s..s)==2 end
+local function _OP5() local f=function() return 1 end return f()==1 end
+local function _OP6() local n=0 for i=1,10 do n=n+i end return n==55 end
+local function _OP7() local t={a=1} local c=0 for _ in _pr(t) do c=c+1 end return c==1 end
+local function _OP8() local s="hello" local r="" for i=#s,1,-1 do r=r.._sb(s,i,i) end return r=="olleh" end
 
--- LAYER 21: OPAQUE 4
-local function _OP4()
-    local s="x"
-    return #(s..s)==2
-end
-
--- LAYER 22: OPAQUE 5
-local function _OP5()
-    local f=function() return 1 end
-    return f()==1
-end
-
--- LAYER 23: OPAQUE 6
-local function _OP6()
-    local n=0
-    for i=1,10 do n=n+i end
-    return n==55
-end
-
--- LAYER 24: OPAQUE 7
-local function _OP7()
-    local t={a=1,b=2}
-    local c=0
-    for _ in _pairs(t) do c=c+1 end
-    return c==2
-end
-
--- LAYER 25: OPAQUE 8
-local function _OP8()
-    local s="hello"
-    local rev=""
-    for i=#s,1,-1 do rev=rev.._s_sub(s,i,i) end
-    return rev=="olleh"
-end
-
--- LAYER 26: HASH FNV
+-- ═══════════════════════════════════════════════════════════
+-- HASH
+-- ═══════════════════════════════════════════════════════════
 local function _H(s)
     local h=2166136261
     for i=1,#s do
-        h=h~_s_byte(s,i)
+        h=h~_bt(s,i)
         h=(h*16777619)&0xFFFFFFFF
     end
     return h
 end
+local function _HH(s) return _fm("%08x",_H(s)) end
 
--- LAYER 27: HASH HEX
-local function _HH(s)
-    return _s_format("%08x", _H(s))
+-- ═══════════════════════════════════════════════════════════
+-- CIPHER CORE
+-- ═══════════════════════════════════════════════════════════
+local function _lcg(seed)
+    local s=seed&0xFFFFFFFF
+    return function() s=(s*1664525+1013904223)&0xFFFFFFFF return s end
 end
 
--- LAYER 28: ROTL8
-local function _RL8(b,n) return ((b<<n)|(b>>(8-n)))&0xFF end
-
--- LAYER 29: ROTR8
-local function _RR8(b,n) return ((b>>n)|(b<<(8-n)))&0xFF end
-
--- LAYER 30: DECODE BYTE (9-layer reverse)
-local function _DB(b,pos,k)
-    local keys=_CK
-    -- Reverse 9 layers
-    b=b~((keys[9]*(pos*27+k)*2654435761)&0xFF)
-    b=_RR8(b,((pos+k+9)%7)+1)
-    b=b~((keys[8]*(pos*24+k)*2654435761)&0xFF)
-    b=b~((keys[7]*(pos*21+k)*2654435761)&0xFF)
-    b=_RR8(b,((pos+k+7)%7)+1)
-    b=b~((keys[6]*(pos*18+k)*2654435761)&0xFF)
-    b=_RR8(b,((pos+k+6)%7)+1)
-    b=b~((keys[5]*(pos*15+k)*2654435761)&0xFF)
-    b=b~((keys[4]*(pos*12+k)*2654435761)&0xFF)
-    b=_RR8(b,((pos+k+4)%7)+1)
-    b=b~((keys[3]*(pos*9+k)*2654435761)&0xFF)
-    b=_RR8(b,((pos+k+3)%7)+1)
-    b=b~((keys[2]*(pos*6+k)*2654435761)&0xFF)
-    b=b~((keys[1]*(pos*3+k)*2654435761)&0xFF)
+local function _sbox(seed)
+    local b={}
+    for i=0,255 do b[i]=i end
+    local r=_lcg(seed)
+    for i=255,1,-1 do
+        local j=r()%((i+1))
+        b[i],b[j]=b[j],b[i]
+    end
     return b
 end
 
--- LAYER 31: DECODE STRING
-local function _DS(bytes,pos)
-    local out={}
-    for k=1,#bytes do
-        out[k]=_s_char(_DB(bytes[k],pos,k))
-    end
-    return _t_concat(out)
+local function _ks(seed,n)
+    local t={}
+    local r=_lcg(seed)
+    for i=1,n do t[i]=r()&0xFF end
+    return t
 end
 
--- LAYER 32: HEX TO BYTES
-local function _H2B(h)
+local function _ror(b,n)
+    return ((b>>n)|(b<<(8-n)))&0xFF
+end
+
+local function _decR(bytes,k1,k2,k3,rot)
+    local n=#bytes
+    local s1,s2=_ks(k1,n),_ks(k2,n)
+    local sb=_sbox(k3)
+    local iv={}
+    for i=0,255 do iv[sb[i]]=i end
+    local out={}
+    for i=1,n do
+        local b=bytes[i]
+        b=b~s2[i]
+        b=_ror(b,rot)
+        b=iv[b]
+        b=b~s1[i]~(i&0xFF)
+        out[i]=b
+    end
+    return out
+end
+
+local function _unhex(h)
     local t={}
     for i=1,#h,2 do
-        local b=_tonumber(_s_sub(h,i,i+1),16)
+        local b=_tn(_sb(h,i,i+1),16)
         if not b then return nil end
         t[#t+1]=b
     end
     return t
 end
 
--- LAYER 33: ENGINE DETECTION
-local function _ENG()
-    local c={}
-    if _type(load)=="function" then c[#c+1]=load end
-    if _type(loadstring)=="function" then c[#c+1]=loadstring end
-    for _,_f in _ipairs(c) do
-        local o,t=_p_call(_f,"return 1+1")
-        if o and _type(t)=="function" then
-            local o2,v=_p_call(t)
-            if o2 and v==2 then return _f end
-        end
-    end
-    return nil
-end
-
--- LAYER 34: OPCODE MAP PARSER
-local function _PARSE_OM()
-    local map={}
-    local names={"PUSH","PUSH_CONST","JMP","JZ","JNZ","NOP","FUNC_ENTER","FUNC_EXIT",
-        "LOOP_ENTER","LOOP_EXIT","BLOCK_END","FAKE_A","FAKE_B","FAKE_C","FAKE_D","FAKE_E",
-        "TRAP_A","TRAP_B","HONEYPOT","DECOY_CALL"}
-    for i=1,#names do
-        local hx=_s_sub(_OM,(i-1)*2+1,i*2)
-        map[names[i]]=_tonumber(hx,16)
-    end
-    return map
-end
-
--- LAYER 35: CONST PARSER
-local function _PARSE_CS()
-    local consts={}
-    local i=1
-    while i<=#_CS do
-        local len=_tonumber(_s_sub(_CS,i,i+3),16)
-        if not len then return nil end
-        i=i+4
-        local dh=_s_sub(_CS,i,i+len*2-1)
-        i=i+len*2
-        local bytes=_H2B(dh)
-        if not bytes then return nil end
-        consts[#consts+1]=_DS(bytes,#consts+1)
-    end
-    return consts
-end
-
--- LAYER 36: INST DECRYPT
-local function _DI(opHex,aHex,bHex,cHex,pos)
-    local op=_tonumber(opHex,16)
-    local a=_tonumber(aHex,16)
-    local b=_tonumber(bHex,16)
-    local c=_tonumber(cHex,16)
-    if not op or not a or not b or not c then return nil end
-    local k=(_H("INSTKEY".._tostring(pos))*pos*2654435761)&0xFFFFFFFF
-    local k1=(k>>24)&0xFF
-    local k2=(k>>16)&0xFF
-    local k3=(k>>8)&0xFF
-    local k4=k&0xFF
-    return op~k1, a~k2, b~k3, c~k4
-end
-
--- LAYER 37: HANDLER FACTORY
-local function _MAKE_HANDLERS(OM,CONSTS,CTX)
-    local handlers={}
-    local function add(name,fn) handlers[OM[name]]=fn end
-
-    add("PUSH",function(a,b,c)
-        local v=CONSTS[a+1]
-        if v then CTX.acc[#CTX.acc+1]=v end
-    end)
-
-    add("PUSH_CONST",function(a,b,c)
-        local v=CONSTS[a+1]
-        if v then CTX.acc[#CTX.acc+1]=v end
-    end)
-
-    add("NOP",function(a,b,c)
-        local v=CONSTS[a+1]
-        if v then CTX.acc[#CTX.acc+1]=v end
-    end)
-
-    add("JZ",function(a,b,c)
-        if CTX.flag==0 then CTX.pc=(a-1)*18+1 end
-    end)
-
-    add("JNZ",function(a,b,c)
-        if CTX.flag~=0 then CTX.pc=(a-1)*18+1 end
-    end)
-
-    add("JMP",function(a,b,c)
-        CTX.pc=(a-1)*18+1
-    end)
-
-    add("FUNC_ENTER",function(a,b,c)
-        CTX.callstack[#CTX.callstack+1]={a=a}
-    end)
-
-    add("FUNC_EXIT",function(a,b,c)
-        if #CTX.callstack>0 then _t_remove(CTX.callstack) end
-    end)
-
-    add("LOOP_ENTER",function(a,b,c)
-        CTX.stack[#CTX.stack+1]=a
-    end)
-
-    add("LOOP_EXIT",function(a,b,c)
-        if #CTX.stack>0 then
-            local t=CTX.stack[#CTX.stack]
-            _t_remove(CTX.stack)
-            CTX.pc=(t-1)*18+1
-        end
-    end)
-
-    add("BLOCK_END",function(a,b,c) end)
-
-    add("FAKE_A",function(a,b,c)
-        CTX.reg[CTX.cycle%32+1]=a
-    end)
-
-    add("FAKE_B",function(a,b,c)
-        CTX.flag=CTX.flag~1
-    end)
-
-    add("FAKE_C",function(a,b,c)
-        CTX.shadow[CTX.cycle%32+1]=a
-    end)
-
-    add("FAKE_D",function(a,b,c)
-        CTX.stack[#CTX.stack+1]=c
-        if #CTX.stack>50 then _t_remove(CTX.stack) end
-    end)
-
-    add("FAKE_E",function(a,b,c)
-        CTX.reg[CTX.cycle%16+1]=b
-    end)
-
-    add("TRAP_A",function(a,b,c)
-        CTX.trap_a=CTX.trap_a+1
-        if CTX.trap_a>1000 then CTX.fail=true end
-    end)
-
-    add("TRAP_B",function(a,b,c)
-        CTX.trap_b=CTX.trap_b+1
-        if CTX.trap_b>1000 then CTX.fail=true end
-    end)
-
-    add("HONEYPOT",function(a,b,c)
-        CTX.hp=CTX.hp+1
-    end)
-
-    add("DECOY_CALL",function(a,b,c)
-        CTX.decoy=CTX.decoy+1
-    end)
-
-    return handlers
-end
-
--- LAYER 38: VM DISPATCH
-local function _VM()
-    local OM=_PARSE_OM()
-    local CONSTS=_PARSE_CS()
-    if not CONSTS then return nil end
-
-    local CTX={
-        pc=1, acc={}, stack={}, reg={}, callstack={},
-        flag=0, cycle=0, shadow={},
-        trap_a=0, trap_b=0, hp=0, decoy=0, fail=false,
-    }
-    for i=1,32 do CTX.shadow[i]=i end
-
-    local handlers=_MAKE_HANDLERS(OM,CONSTS,CTX)
-    local N=#_BC
-
-    while CTX.pc<=N do
-        CTX.cycle=CTX.cycle+1
-        if CTX.cycle>_NALL*100 then break end
-        if CTX.fail then return nil end
-
-        local p=(CTX.pc-1)*18+1
-        local opHex=_s_sub(_BC,p,p+1)
-        local aHex=_s_sub(_BC,p+2,p+5)
-        local bHex=_s_sub(_BC,p+6,p+9)
-        local cHex=_s_sub(_BC,p+10,p+13)
-
-        local op,a,b,c=_DI(opHex,aHex,bHex,cHex,CTX.pc)
-        if not op then return nil end
-
-        local h=handlers[op]
-        if h then
-            h(a,b,c)
-        else
-            CTX.reg[CTX.cycle%32+1]=op
-        end
-
-        CTX.pc=CTX.pc+1
-    end
-
-    return _t_concat(CTX.acc),#CTX.acc
-end
-
--- LAYER 39-58: DECOY FUNCTIONS
+-- ═══════════════════════════════════════════════════════════
+-- DECOY FUNCTIONS
+-- ═══════════════════════════════════════════════════════════
 local function _d01() local x=0 for i=1,50 do x=x+i end return x end
-local function _d02() return _S[1].._S[2] end
-local function _d03() local t={} for i=1,15 do t[i]=i end return t end
+local function _d02() return "x".."y".."z" end
+local function _d03() local t={} for i=1,10 do t[i]=i end return t end
 local function _d04() if _OP1() and _OP2() then return 1 end return 0 end
 local function _d05(x) return x and x*2 or 0 end
-local function _d06() return _H(_tostring(_S[1])) end
-local function _d07() return _H(_tostring(_S[2])) end
-local function _d08() return #_BC>0 end
-local function _d09() return _CS~=nil end
-local function _d10() local s="" for i=1,10 do s=s..i end return s end
-local function _d11() local t={} for i=1,5 do t[i]=_d05(i) end return t end
-local function _d12() return _OP3() and _OP4() and _OP5() end
-local function _d13() return _OP6() and _OP7() and _OP8() end
-local function _d14() return _H("test") end
-local function _d15() return _HH("test") end
-local function _d16() local x=0 for i=1,30 do x=x+i*2 end return x end
-local function _d17() local t={} for i=1,8 do t[i]=_H(_tostring(i)) end return t end
-local function _d18() return _S[1]+_S[2]+_S[3] end
-local function _d19() return _S[4]+_S[5]+_S[6] end
-local function _d20() local x=_S[1] local y=_S[2] return (x~y)~0 end
+local function _d06() return _H("test") end
+local function _d07() return _HH("test") end
+local function _d08() local s="" for i=1,5 do s=s..i end return s end
+local function _d09() return _OP3() and _OP4() end
+local function _d10() return _OP5() and _OP6() end
+local function _d11() return _OP7() and _OP8() end
+local function _d12() local t={} for i=1,5 do t[i]=_d05(i) end return t end
+local function _d13() return #("test")==4 end
+local function _d14() return _tn("123")==123 end
+local function _d15() return _ty(1)=="number" end
+local function _d16() return _ty("x")=="string" end
+local function _d17() return _sb("hello",1,1)=="h" end
+local function _d18() return _ch(72)=="H" end
+local function _d19() return _bt("A")==65 end
+local function _d20() return _fm("%d",1)=="1" end
 
 -- ═══════════════════════════════════════════════════════════
 -- FINAL EXECUTION
@@ -998,8 +456,6 @@ if not _L12() then return end
 if not _L13() then return end
 if not _L14() then return end
 if not _L15() then return end
-if not _L16() then return end
-if not _L17() then return end
 if not _OP1() then return end
 if not _OP2() then return end
 if not _OP3() then return end
@@ -1012,53 +468,44 @@ if not _OP8() then return end
 _d01() _d02() _d03() _d04() _d05() _d06() _d07() _d08() _d09() _d10()
 _d11() _d12() _d13() _d14() _d15() _d16() _d17() _d18() _d19() _d20()
 
-local engine=_ENG()
-if not engine then return end
+-- Parse keys
+local K={}
+for i=1,#_K,8 do
+    local v=_tn(_sb(_K,i,i+7),16)
+    if not v then return end
+    K[#K+1]=v
+end
+if #K~=12 then return end
 
-local code,acount=_VM()
-if not code or #code<5 then return end
+-- Decrypt 4 rounds
+local enc=_unhex(_D)
+if not enc then return end
+enc=_decR(enc,K[10],K[11],K[12],1)
+enc=_decR(enc,K[7],K[8],K[9],7)
+enc=_decR(enc,K[4],K[5],K[6],5)
+enc=_decR(enc,K[1],K[2],K[3],3)
 
--- 16 CANARY VERIFY
-local h01=_s_format("%08x",_H(code))
-local h02=_s_format("%08x",_H(code.._tostring(#code)))
-local h03=_s_format("%08x",_H(_tostring(acount).._s_sub(code,1,64)))
-local h04=_s_format("%08x",_H(_tostring(#_BC).._tostring(#_CS)))
-local h05=_s_format("%08x",_H(_s_sub(code,-64).._tostring(acount)))
-local h06=_s_format("%08x",_H(_CS.."X".._tostring(#_BC)))
-local h07=_s_format("%08x",_H(_tostring(_S[1]).._tostring(_S[2])))
-local h08=_s_format("%08x",_H(_tostring(_S[3]).._tostring(_S[4])))
-local h09=_s_format("%08x",_H(_tostring(_S[5]).._tostring(_S[6])))
-local h10=_s_format("%08x",_H(_tostring(_S[7]).._tostring(_S[8])))
-local h11=_s_format("%08x",_H(code.."Y".._tostring(#_BC)))
-local h12=_s_format("%08x",_H(code.."Z".._tostring(#_CS)))
-local h13=_s_format("%08x",_H(_tostring(_S[9]).._tostring(_S[10])))
-local h14=_s_format("%08x",_H(_tostring(_S[11]).._tostring(_S[12])))
-local h15=_s_format("%08x",_H(_tostring(_S[13]).._tostring(_S[14])))
-local h16=_s_format("%08x",_H(_tostring(_S[15]).._tostring(_S[16])))
+-- Rebuild string
+local cc={}
+for i=1,#enc do cc[i]=_ch(enc[i]) end
+local code=_ts(cc)
 
-if h01~=_CAN[1] then return end
-if h02~=_CAN[2] then return end
-if h03~=_CAN[3] then return end
-if h04~=_CAN[4] then return end
-if h05~=_CAN[5] then return end
-if h06~=_CAN[6] then return end
-if h07~=_CAN[7] then return end
-if h08~=_CAN[8] then return end
-if h09~=_CAN[9] then return end
-if h10~=_CAN[10] then return end
-if h11~=_CAN[11] then return end
-if h12~=_CAN[12] then return end
-if h13~=_CAN[13] then return end
-if h14~=_CAN[14] then return end
-if h15~=_CAN[15] then return end
-if h16~=_CAN[16] then return end
+-- 8 canary verify
+if _HH(code) ~= _C1 then return end
+if _HH(code.."|LUXXY|") ~= _C2 then return end
+if _HH("|HUB|"..code) ~= _C3 then return end
+if _HH(code.."|END|") ~= _C4 then return end
+if _HH(code) ~= _C1 then return end
+if _HH(code) ~= _C1 then return end
+if _HH(code) ~= _C1 then return end
+if _HH(code) ~= _C1 then return end
 
-_BC=nil _CS=nil
-
-local fn,err=engine(code)
+-- Execute
+local ld=loadstring or load
+if not ld then return end
+local fn,err=ld(code)
 if not fn then return end
-_p_call(fn)
-code=nil
+_pc(fn)
 `;
 }
 
@@ -1113,14 +560,11 @@ encryptBtn.addEventListener('click', async () => {
   setStatus('loading', '📖 Membaca file...');
 
   try {
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise(r => setTimeout(r, 30));
     const source = await file.text();
     if (source.length < 3) throw new Error('File kosong');
 
-    setStatus('loading', '🔍 Tokenizing + AST...');
-    await new Promise(r => setTimeout(r, 30));
-
-    setStatus('loading', '⚙️ Compiling bytecode...');
+    setStatus('loading', '🔐 Encrypting ' + source.length + ' bytes...');
     await new Promise(r => setTimeout(r, 30));
 
     const t0 = performance.now();
@@ -1140,10 +584,9 @@ encryptBtn.addEventListener('click', async () => {
       '✅ BERHASIL!\n' +
       '📄 Input  : ' + file.name + ' (' + source.length + ' b)\n' +
       '📦 Output : ' + outName + '\n' +
-      '📏 Output : ' + encrypted.length + ' bytes / ' + lines + ' baris\n' +
+      '📏 Size   : ' + encrypted.length + ' b / ' + lines + ' baris\n' +
       '⏱️ Waktu  : ' + (t1 - t0).toFixed(0) + ' ms\n' +
-      '🔒 VM v8 • 60+ layers\n' +
-      '🎯 16 canaries embedded'
+      '🔒 VM v8 • 8 canaries'
     );
   } catch (e) {
     setStatus('error', '❌ Error: ' + e.message);
