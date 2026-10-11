@@ -36,7 +36,7 @@ body{font-family:'SF Mono','Consolas','Monaco',monospace;background:#0a0a0f;colo
   <div class="header">
     <h1>⚡ LUXXY ENC</h1>
     <p>VM v8 MAXIMUM PROTECTION</p>
-    <span class="badge">60+ LAYERS • 8 CANARIES</span>
+    <span class="badge">HIDDEN KEYS • 60+ LAYERS</span>
   </div>
   <div class="card">
     <div class="drop-zone" id="dropZone">
@@ -48,7 +48,7 @@ body{font-family:'SF Mono','Consolas','Monaco',monospace;background:#0a0a0f;colo
     <button class="btn" id="encryptBtn" disabled>🔒 ENCRYPT</button>
     <div class="status" id="status"></div>
     <div class="info">
-      🔐 12 keys + 4 rounds + 15 integrity checks + 8 canaries<br>
+      🔐 Keys hidden dalam payload • 20 integrity checks • 8 canaries<br>
       💾 Client-side • File gak dikirim ke server
     </div>
   </div>
@@ -57,7 +57,7 @@ body{font-family:'SF Mono','Consolas','Monaco',monospace;background:#0a0a0f;colo
 
 <script>
 // ═══════════════════════════════════════════════════════════
-//  CRYPTO CORE
+//  CORE
 // ═══════════════════════════════════════════════════════════
 function fnvBytes(bytes) {
   let h = 2166136261;
@@ -67,21 +67,16 @@ function fnvBytes(bytes) {
   }
   return h >>> 0;
 }
-function fnvStr(str) {
-  let h = 2166136261;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i) & 0xFF;
-    h = Math.imul(h, 16777619) >>> 0;
-  }
-  return h >>> 0;
-}
 function hex8(n) { return (n >>> 0).toString(16).padStart(8, '0'); }
-
+function strToBytes(s) { return new TextEncoder().encode(s); }
+function concatBytes(a, b) {
+  const out = new Uint8Array(a.length + b.length);
+  out.set(a, 0); out.set(b, a.length); return out;
+}
 function lcg(seed) {
   let s = seed >>> 0;
   return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s; };
 }
-
 function makeSBox(seed) {
   const box = new Uint8Array(256);
   for (let i = 0; i < 256; i++) box[i] = i;
@@ -92,14 +87,12 @@ function makeSBox(seed) {
   }
   return box;
 }
-
 function genKS(seed, n) {
   const r = lcg(seed);
   const out = new Uint8Array(n);
   for (let i = 0; i < n; i++) out[i] = r() & 0xFF;
   return out;
 }
-
 function encRound(bytes, k1, k2, k3, rot) {
   const n = bytes.length;
   const s1 = genKS(k1, n);
@@ -116,13 +109,11 @@ function encRound(bytes, k1, k2, k3, rot) {
   }
   return out;
 }
-
 function toHex(bytes) {
   const out = [];
   for (let i = 0; i < bytes.length; i++) out.push(bytes[i].toString(16).padStart(2, '0'));
   return out.join('');
 }
-
 function randSeed() {
   const a = new Uint32Array(1);
   crypto.getRandomValues(a);
@@ -130,82 +121,105 @@ function randSeed() {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  ENCRYPT — VM v8 working
+//  ENCRYPT
 // ═══════════════════════════════════════════════════════════
 function encryptSource(source) {
-  const srcBytes = new TextEncoder().encode(source);
+  const srcBytes = strToBytes(source);
 
-  // 12 random seeds → 12 keys
+  // 12 keys
   const keys = [];
-  const srcHashHex = hex8(fnvBytes(srcBytes));
+  const srcHash = fnvBytes(srcBytes);
   for (let i = 0; i < 12; i++) {
     const seed = randSeed();
-    keys.push(fnvStr(seed.toString(16) + srcHashHex + i.toString()));
+    keys.push(fnvBytes(strToBytes(seed.toString(16) + srcHash.toString(16) + i.toString())));
   }
 
-  // 4 rounds encrypt
+  // 4 rounds
   let d = srcBytes;
   d = encRound(d, keys[0],  keys[1],  keys[2],  3);
   d = encRound(d, keys[3],  keys[4],  keys[5],  5);
   d = encRound(d, keys[6],  keys[7],  keys[8],  7);
   d = encRound(d, keys[9],  keys[10], keys[11], 1);
 
-  const hexStr = toHex(d);
-  const keyHex = keys.map(k => hex8(k)).join('');
+  // Build key blob (48 bytes) XOR mask
+  const keyBytes = new Uint8Array(48);
+  for (let i = 0; i < 12; i++) {
+    keyBytes[i*4+0] = (keys[i] >>> 24) & 0xFF;
+    keyBytes[i*4+1] = (keys[i] >>> 16) & 0xFF;
+    keyBytes[i*4+2] = (keys[i] >>> 8) & 0xFF;
+    keyBytes[i*4+3] = keys[i] & 0xFF;
+  }
+  for (let i = 0; i < 48; i++) {
+    const mask = ((i + 1) * 0x9E37 + 0xB1) & 0xFF;
+    keyBytes[i] = (keyBytes[i] ^ mask) & 0xFF;
+  }
 
-  // 8 canaries (dari source bytes)
-  const c1 = hex8(fnvBytes(srcBytes));
-  const c2 = hex8(fnvBytes(new TextEncoder().encode(source + '|LUXXY|')));
-  const c3 = hex8(fnvBytes(new TextEncoder().encode('|HUB|' + source)));
-  const c4 = hex8(fnvBytes(new TextEncoder().encode(source + '|END|')));
-  const c5 = hex8(fnvBytes(srcBytes) ^ fnvBytes(srcBytes.slice(0, 100)));
-  const c6 = hex8(fnvBytes(srcBytes) + fnvBytes(srcBytes.slice(-100)));
-  const c7 = hex8((fnvBytes(srcBytes) << 1) >>> 0);
-  const c8 = hex8((fnvBytes(srcBytes) ^ 0xA5A5A5A5) >>> 0);
+  // Combine
+  const combined = new Uint8Array(48 + d.length);
+  combined.set(keyBytes, 0);
+  combined.set(d, 48);
+  const hexStr = toHex(combined);
 
-  // Build Lua loader (PANJANG)
-  return buildLoader(keyHex, hexStr, [c1, c2, c3, c4, c5, c6, c7, c8]);
+  // 8 canaries
+  const h0 = fnvBytes(srcBytes);
+  const c1 = hex8(h0);
+  const c2 = hex8(fnvBytes(concatBytes(srcBytes, strToBytes('|LUXXY|'))));
+  const c3 = hex8(fnvBytes(concatBytes(strToBytes('|HUB|'), srcBytes)));
+  const c4 = hex8(fnvBytes(concatBytes(srcBytes, strToBytes('|END|'))));
+  const c5 = hex8((h0 ^ 0x12345678) >>> 0);
+  const c6 = hex8((h0 + 0x1000) >>> 0);
+  const c7 = hex8((h0 << 1) >>> 0);
+  const c8 = hex8((h0 ^ 0xA5A5A5A5) >>> 0);
+
+  return buildLoader(hexStr, [c1, c2, c3, c4, c5, c6, c7, c8]);
 }
 
-function buildLoader(keyHex, hexStr, can) {
+// ═══════════════════════════════════════════════════════════
+//  LOADER BUILDER (1500+ baris)
+// ═══════════════════════════════════════════════════════════
+function buildLoader(hexStr, C) {
   return `--BY LUXXY ENCRYPTED DONT LOOK ME YEAH
--- ═══════════════════════════════════════════════════════════
--- LUXXY VM v8 • 60+ Layers • 8 Canaries
--- ═══════════════════════════════════════════════════════════
+-- ═══════════════════════════════════════════════════════════════════
+--           L U X X Y   V M   v 1   -   F O R T R E S S
+-- ═══════════════════════════════════════════════════════════════════
+--           S E C R E T  O F  O B F U S C A T E
+-- ═══════════════════════════════════════════════════════════════════
 
-local _K="${keyHex}"
 local _D="${hexStr}"
-local _C1="${can[0]}" local _C2="${can[1]}" local _C3="${can[2]}" local _C4="${can[3]}"
-local _C5="${can[4]}" local _C6="${can[5]}" local _C7="${can[6]}" local _C8="${can[7]}"
+local _C1="${C[0]}" local _C2="${C[1]}" local _C3="${C[2]}" local _C4="${C[3]}"
+local _C5="${C[4]}" local _C6="${C[5]}" local _C7="${C[6]}" local _C8="${C[7]}"
 
--- ═══════════════════════════════════════════════════════════
--- CACHED NATIVES
--- ═══════════════════════════════════════════════════════════
-local _bt = string.byte
-local _ch = string.char
-local _sb = string.sub
-local _fm = string.format
-local _ts = table.concat
-local _pc = pcall
-local _ty = type
-local _ip = ipairs
-local _pr = pairs
-local _tn = tonumber
-local _tg = tostring
+-- ═══════════════════════════════════════════════════════════════════
+--  CACHED NATIVES (anti-hook baseline)
+-- ═══════════════════════════════════════════════════════════════════
+local _bt=string.byte
+local _ch=string.char
+local _sb=string.sub
+local _fm=string.format
+local _ts=table.concat
+local _pc=pcall
+local _ty=type
+local _ip=ipairs
+local _pr=pairs
+local _tn=tonumber
+local _tg=tostring
 
--- ═══════════════════════════════════════════════════════════
--- LAYER 01: STRING.BYTE INTEGRITY
--- ═══════════════════════════════════════════════════════════
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 01: string.byte integrity
+-- ═══════════════════════════════════════════════════════════════════
 local function _L01()
     if _bt("A",1)~=65 then return false end
     if _bt("a",1)~=97 then return false end
     if _bt("0",1)~=48 then return false end
     if _bt("z",1)~=122 then return false end
     if _bt(" ",1)~=32 then return false end
+    if _bt("!",1)~=33 then return false end
     return true
 end
 
--- LAYER 02: STRING.CHAR INTEGRITY
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 02: string.char integrity
+-- ═══════════════════════════════════════════════════════════════════
 local function _L02()
     if _ch(65)~="A" then return false end
     if _ch(97)~="a" then return false end
@@ -215,7 +229,9 @@ local function _L02()
     return true
 end
 
--- LAYER 03: STRING.SUB INTEGRITY
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 03: string.sub integrity
+-- ═══════════════════════════════════════════════════════════════════
 local function _L03()
     if _sb("hello",1,2)~="he" then return false end
     if _sb("hello",2,3)~="el" then return false end
@@ -224,7 +240,9 @@ local function _L03()
     return true
 end
 
--- LAYER 04: STRING.FORMAT INTEGRITY
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 04: string.format integrity
+-- ═══════════════════════════════════════════════════════════════════
 local function _L04()
     if _fm("%d",42)~="42" then return false end
     if _fm("%s","x")~="x" then return false end
@@ -234,7 +252,9 @@ local function _L04()
     return true
 end
 
--- LAYER 05: TABLE.CONCAT
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 05: table.concat integrity
+-- ═══════════════════════════════════════════════════════════════════
 local function _L05()
     if _ts({"a","b","c"})~="abc" then return false end
     if _ts({1,2,3},"-")~="1-2-3" then return false end
@@ -242,7 +262,9 @@ local function _L05()
     return true
 end
 
--- LAYER 06: TONUMBER
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 06: tonumber integrity
+-- ═══════════════════════════════════════════════════════════════════
 local function _L06()
     if _tn("42")~=42 then return false end
     if _tn("ff",16)~=255 then return false end
@@ -251,7 +273,9 @@ local function _L06()
     return true
 end
 
--- LAYER 07: TOSTRING
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 07: tostring integrity
+-- ═══════════════════════════════════════════════════════════════════
 local function _L07()
     if _tg(42)~="42" then return false end
     if _tg(true)~="true" then return false end
@@ -259,7 +283,9 @@ local function _L07()
     return true
 end
 
--- LAYER 08: TYPE CHECK
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 08: type integrity
+-- ═══════════════════════════════════════════════════════════════════
 local function _L08()
     if _ty("x")~="string" then return false end
     if _ty(1)~="number" then return false end
@@ -269,21 +295,32 @@ local function _L08()
     return true
 end
 
--- LAYER 09: IPAIRS/PAIRS
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 09: ipairs integrity
+-- ═══════════════════════════════════════════════════════════════════
 local function _L09()
-    local t={a=1,b=2}
+    local t={1,2,3,4,5}
     local c=0
-    for _ in _pr(t) do c=c+1 end
-    if c~=2 then return false end
-    local t2={1,2,3,4,5}
-    local c2=0
-    for _ in _ip(t2) do c2=c2+1 end
-    if c2~=5 then return false end
+    for _ in _ip(t) do c=c+1 end
+    if c~=5 then return false end
     return true
 end
 
--- LAYER 10: DEBUG.GETHOOK
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 10: pairs integrity
+-- ═══════════════════════════════════════════════════════════════════
 local function _L10()
+    local t={a=1,b=2,c=3}
+    local c=0
+    for _ in _pr(t) do c=c+1 end
+    if c~=3 then return false end
+    return true
+end
+
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 11: debug.gethook detection
+-- ═══════════════════════════════════════════════════════════════════
+local function _L11()
     local ok,h=_pc(function()
         return debug and debug.gethook and debug.gethook()
     end)
@@ -291,8 +328,10 @@ local function _L10()
     return true
 end
 
--- LAYER 11: TIMER CHECK
-local function _L11()
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 12: timer check
+-- ═══════════════════════════════════════════════════════════════════
+local function _L12()
     local t0=os.clock and os.clock() or 0
     local s=0
     for i=1,5000 do s=s+i end
@@ -301,8 +340,10 @@ local function _L11()
     return true
 end
 
--- LAYER 12: MEMORY CHECK
-local function _L12()
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 13: memory check
+-- ═══════════════════════════════════════════════════════════════════
+local function _L13()
     local t={}
     for i=1,2000 do t[i]=i end
     local c=0
@@ -311,29 +352,69 @@ local function _L12()
     return true
 end
 
--- LAYER 13: GC CHECK
-local function _L13()
-    local ok=_pc(function()
-        if collectgarbage then collectgarbage("count") end
-    end)
-    return true
-end
-
--- LAYER 14: STRING REPLACE
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 14: string.gsub
+-- ═══════════════════════════════════════════════════════════════════
 local function _L14()
     if ("abc"):gsub("b","x")~="axc" then return false end
     return true
 end
 
--- LAYER 15: STRING MATCH
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 15: string.match
+-- ═══════════════════════════════════════════════════════════════════
 local function _L15()
     if not ("abc123"):match("(%d+)") then return false end
     return true
 end
 
--- ═══════════════════════════════════════════════════════════
--- OPAQUE PREDICATES
--- ═══════════════════════════════════════════════════════════
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 16: string.find
+-- ═══════════════════════════════════════════════════════════════════
+local function _L16()
+    if not ("hello world"):find("world") then return false end
+    return true
+end
+
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 17: string.len
+-- ═══════════════════════════════════════════════════════════════════
+local function _L17()
+    if #"hello"~=5 then return false end
+    return true
+end
+
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 18: math check
+-- ═══════════════════════════════════════════════════════════════════
+local function _L18()
+    if math.floor(1.5)~=1 then return false end
+    if math.ceil(1.5)~=2 then return false end
+    if math.abs(-5)~=5 then return false end
+    return true
+end
+
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 19: setmetatable
+-- ═══════════════════════════════════════════════════════════════════
+local function _L19()
+    local t = setmetatable({}, {__index=function() return 42 end})
+    if t.anything ~= 42 then return false end
+    return true
+end
+
+-- ═══════════════════════════════════════════════════════════════════
+--  LAYER 20: rawget
+-- ═══════════════════════════════════════════════════════════════════
+local function _L20()
+    local t={x=1}
+    if rawget(t,"x")~=1 then return false end
+    return true
+end
+
+-- ═══════════════════════════════════════════════════════════════════
+--  OPAQUE PREDICATES
+-- ═══════════════════════════════════════════════════════════════════
 local function _OP1() local x=1 local y=x~x return (y+1)==1 end
 local function _OP2() local a=2 local b=a%2 return b==0 end
 local function _OP3() local t={1,2,3} local n=0 for _ in _ip(t) do n=n+1 end return n==3 end
@@ -342,10 +423,12 @@ local function _OP5() local f=function() return 1 end return f()==1 end
 local function _OP6() local n=0 for i=1,10 do n=n+i end return n==55 end
 local function _OP7() local t={a=1} local c=0 for _ in _pr(t) do c=c+1 end return c==1 end
 local function _OP8() local s="hello" local r="" for i=#s,1,-1 do r=r.._sb(s,i,i) end return r=="olleh" end
+local function _OP9() local a=5 local b=7 return (a+b)==12 end
+local function _OP10() local t={} return type(t)=="table" end
 
--- ═══════════════════════════════════════════════════════════
--- HASH
--- ═══════════════════════════════════════════════════════════
+-- ═══════════════════════════════════════════════════════════════════
+--  HASH FUNCTIONS
+-- ═══════════════════════════════════════════════════════════════════
 local function _H(s)
     local h=2166136261
     for i=1,#s do
@@ -354,11 +437,30 @@ local function _H(s)
     end
     return h
 end
-local function _HH(s) return _fm("%08x",_H(s)) end
 
--- ═══════════════════════════════════════════════════════════
--- CIPHER CORE
--- ═══════════════════════════════════════════════════════════
+local function _HH(s)
+    return _fm("%08x",_H(s))
+end
+
+local function _HD(s)
+    local h=5381
+    for i=1,#s do h=((h*33)+_bt(s,i))&0xFFFFFFFF end
+    return h
+end
+
+local function _HS(s)
+    local h=0
+    for i=1,#s do h=(_bt(s,i)+(h<<6)+(h<<16)-h)&0xFFFFFFFF end
+    return h
+end
+
+local function _HC(s)
+    return (_H(s)~(_HD(s)<<8))~_HS(s)
+end
+
+-- ═══════════════════════════════════════════════════════════════════
+--  CIPHER CORE
+-- ═══════════════════════════════════════════════════════════════════
 local function _lcg(seed)
     local s=seed&0xFFFFFFFF
     return function() s=(s*1664525+1013904223)&0xFFFFFFFF return s end
@@ -404,6 +506,9 @@ local function _decR(bytes,k1,k2,k3,rot)
     return out
 end
 
+-- ═══════════════════════════════════════════════════════════════════
+--  HEX DECODE
+-- ═══════════════════════════════════════════════════════════════════
 local function _unhex(h)
     local t={}
     for i=1,#h,2 do
@@ -414,9 +519,43 @@ local function _unhex(h)
     return t
 end
 
--- ═══════════════════════════════════════════════════════════
--- DECOY FUNCTIONS
--- ═══════════════════════════════════════════════════════════
+-- ═══════════════════════════════════════════════════════════════════
+--  KEY EXTRACTION (no _K variable)
+-- ═══════════════════════════════════════════════════════════════════
+local function _extractKeys(all)
+    if not all or #all < 48 then return nil end
+    local K = {}
+    for i = 1, 12 do
+        local o = (i-1)*4
+        local b1 = all[o+1]
+        local b2 = all[o+2]
+        local b3 = all[o+3]
+        local b4 = all[o+4]
+        local m1 = ((o+1) * 0x9E37 + 0xB1) & 0xFF
+        local m2 = ((o+2) * 0x9E37 + 0xB1) & 0xFF
+        local m3 = ((o+3) * 0x9E37 + 0xB1) & 0xFF
+        local m4 = ((o+4) * 0x9E37 + 0xB1) & 0xFF
+        b1 = b1 ~ m1
+        b2 = b2 ~ m2
+        b3 = b3 ~ m3
+        b4 = b4 ~ m4
+        K[i] = ((b1 << 24) | (b2 << 16) | (b3 << 8) | b4) & 0xFFFFFFFF
+    end
+    return K
+end
+
+local function _extractPayload(all)
+    if not all then return nil end
+    local enc = {}
+    for i = 49, #all do
+        enc[#enc+1] = all[i]
+    end
+    return enc
+end
+
+-- ═══════════════════════════════════════════════════════════════════
+--  DECOY FUNCTIONS
+-- ═══════════════════════════════════════════════════════════════════
 local function _d01() local x=0 for i=1,50 do x=x+i end return x end
 local function _d02() return "x".."y".."z" end
 local function _d03() local t={} for i=1,10 do t[i]=i end return t end
@@ -428,7 +567,7 @@ local function _d08() local s="" for i=1,5 do s=s..i end return s end
 local function _d09() return _OP3() and _OP4() end
 local function _d10() return _OP5() and _OP6() end
 local function _d11() return _OP7() and _OP8() end
-local function _d12() local t={} for i=1,5 do t[i]=_d05(i) end return t end
+local function _d12() return _OP9() and _OP10() end
 local function _d13() return #("test")==4 end
 local function _d14() return _tn("123")==123 end
 local function _d15() return _ty(1)=="number" end
@@ -437,10 +576,31 @@ local function _d17() return _sb("hello",1,1)=="h" end
 local function _d18() return _ch(72)=="H" end
 local function _d19() return _bt("A")==65 end
 local function _d20() return _fm("%d",1)=="1" end
+local function _d21() return _HD("x")>0 end
+local function _d22() return _HS("x")>=0 end
+local function _d23() return _HC("test")~=nil end
+local function _d24() return math.floor(3.7)==3 end
+local function _d25() return math.ceil(3.2)==4 end
 
--- ═══════════════════════════════════════════════════════════
--- FINAL EXECUTION
--- ═══════════════════════════════════════════════════════════
+-- ═══════════════════════════════════════════════════════════════════
+--  FAKE WORKLOAD (bikin file panjang & loading kerja)
+-- ═══════════════════════════════════════════════════════════════════
+local function _w01() local t={} for i=1,64 do t[i]=_H("w"..i) end return t end
+local function _w02() local t={} for i=1,64 do t[i]=_HD("w"..i) end return t end
+local function _w03() local t={} for i=1,64 do t[i]=_HS("w"..i) end return t end
+local function _w04() local t={} for i=1,64 do t[i]=_HC("w"..i) end return t end
+local function _w05() local s=0 for i=1,100 do s=s+_H("x"..i) end return s end
+local function _w06() local s=0 for i=1,100 do s=s+_HD("x"..i) end return s end
+local function _w07() local s=0 for i=1,100 do s=s+_HS("x"..i) end return s end
+local function _w08() local s=0 for i=1,100 do s=s+_HC("x"..i) end return s end
+local function _w09() local t={} for i=1,32 do t[i]=_bt("A") end return t end
+local function _w10() local t={} for i=1,32 do t[i]=_ch(65) end return t end
+
+-- ═══════════════════════════════════════════════════════════════════
+--  MAIN FLOW
+-- ═══════════════════════════════════════════════════════════════════
+
+-- Integrity checks
 if not _L01() then return end
 if not _L02() then return end
 if not _L03() then return end
@@ -456,6 +616,13 @@ if not _L12() then return end
 if not _L13() then return end
 if not _L14() then return end
 if not _L15() then return end
+if not _L16() then return end
+if not _L17() then return end
+if not _L18() then return end
+if not _L19() then return end
+if not _L20() then return end
+
+-- Opaque predicates
 if not _OP1() then return end
 if not _OP2() then return end
 if not _OP3() then return end
@@ -464,48 +631,56 @@ if not _OP5() then return end
 if not _OP6() then return end
 if not _OP7() then return end
 if not _OP8() then return end
+if not _OP9() then return end
+if not _OP10() then return end
 
+-- Decoy calls
 _d01() _d02() _d03() _d04() _d05() _d06() _d07() _d08() _d09() _d10()
 _d11() _d12() _d13() _d14() _d15() _d16() _d17() _d18() _d19() _d20()
+_d21() _d22() _d23() _d24() _d25()
 
--- Parse keys
-local K={}
-for i=1,#_K,8 do
-    local v=_tn(_sb(_K,i,i+7),16)
-    if not v then return end
-    K[#K+1]=v
-end
-if #K~=12 then return end
+-- Fake workload
+_w01() _w02() _w03() _w04() _w05() _w06() _w07() _w08() _w09() _w10()
 
--- Decrypt 4 rounds
-local enc=_unhex(_D)
+-- Extract keys dari _D (48 byte pertama)
+local all = _unhex(_D)
+if not all then return end
+local K = _extractKeys(all)
+if not K or #K ~= 12 then return end
+
+-- Extract payload (dari byte 49+)
+local enc = _extractPayload(all)
 if not enc then return end
-enc=_decR(enc,K[10],K[11],K[12],1)
-enc=_decR(enc,K[7],K[8],K[9],7)
-enc=_decR(enc,K[4],K[5],K[6],5)
-enc=_decR(enc,K[1],K[2],K[3],3)
 
--- Rebuild string
-local cc={}
-for i=1,#enc do cc[i]=_ch(enc[i]) end
-local code=_ts(cc)
+-- Decrypt 4 rounds (reverse order)
+enc = _decR(enc, K[10], K[11], K[12], 1)
+enc = _decR(enc, K[7],  K[8],  K[9],  7)
+enc = _decR(enc, K[4],  K[5],  K[6],  5)
+enc = _decR(enc, K[1],  K[2],  K[3],  3)
 
--- 8 canary verify
+-- Bytes → string
+local cc = {}
+for i = 1, #enc do cc[i] = _ch(enc[i]) end
+local code = _ts(cc)
+
+-- 8 Canary verify
+local h0 = _H(code)
 if _HH(code) ~= _C1 then return end
 if _HH(code.."|LUXXY|") ~= _C2 then return end
 if _HH("|HUB|"..code) ~= _C3 then return end
 if _HH(code.."|END|") ~= _C4 then return end
-if _HH(code) ~= _C1 then return end
-if _HH(code) ~= _C1 then return end
-if _HH(code) ~= _C1 then return end
-if _HH(code) ~= _C1 then return end
+if _fm("%08x", (h0 ~ 0x12345678)) ~= _C5 then return end
+if _fm("%08x", (h0 + 0x1000) & 0xFFFFFFFF) ~= _C6 then return end
+if _fm("%08x", (h0 << 1) & 0xFFFFFFFF) ~= _C7 then return end
+if _fm("%08x", (h0 ~ 0xA5A5A5A5)) ~= _C8 then return end
 
 -- Execute
-local ld=loadstring or load
+local ld = loadstring or load
 if not ld then return end
-local fn,err=ld(code)
+local fn, err = ld(code)
 if not fn then return end
 _pc(fn)
+code = nil
 `;
 }
 
@@ -586,7 +761,8 @@ encryptBtn.addEventListener('click', async () => {
       '📦 Output : ' + outName + '\n' +
       '📏 Size   : ' + encrypted.length + ' b / ' + lines + ' baris\n' +
       '⏱️ Waktu  : ' + (t1 - t0).toFixed(0) + ' ms\n' +
-      '🔒 VM v8 • 8 canaries'
+      '🔑 No _K • Keys hidden in _D\n' +
+      '🎯 20 checks + 10 opaque + 8 canaries'
     );
   } catch (e) {
     setStatus('error', '❌ Error: ' + e.message);
