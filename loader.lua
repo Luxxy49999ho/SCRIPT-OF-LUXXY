@@ -2,9 +2,9 @@
 -- LUXXY HUB - PART 1/6
 -- Header, Services, Helper Functions, CheckQuest
 -- ==========================================================
-loadstring(game:HttpGet("https://raw.githubusercontent.com/TurboLite/Script/refs/heads/main/attack-module.lua"))()
-local Y = game.Players;
-local d = Y.LocalPlayer;
+pcall(function() 
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/TurboLite/Script/refs/heads/main/attack-module.lua"))() 
+end)
 local R = d.Character.HumanoidRootPart;
 local Q = game:GetService("ReplicatedStorage");
 local r = d.Data.Level.Value;
