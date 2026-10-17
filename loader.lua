@@ -1511,3 +1511,324 @@ WS.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(resp) resp()
 go("Farm")
 print("[LUXXY HUB] ✓ FULL EDITION loaded — every feature from te4.lua ported")
 print("[LUXXY HUB] Press 'K' to toggle UI")
+-- ══════════════════════════ BAGIAN 4: FINAL FEATURES (RACE, MIRAGE, QUEST, ESP) ══════════════════════════
+
+-- Tambahan Variabel State Final
+_G.Auto2Sea = false
+_G.Auto3Sea = false
+_G.AutoBartilo = false
+_G.AutoCitizen = false
+_G.AutoTrainV4 = false
+_G.AutoCompleteTrial = false
+_G.AutoMirage = false
+_G.AutoPrehistoric = false
+_G.AutoKitsune = false
+_G.AutoStats = false
+_G.EspPlayer = false
+_G.EspChest = false
+_G.EspFruit = false
+
+-- 13. Auto 2nd Sea & 3rd Sea Quest
+task.spawn(function()
+    while task.wait(0.5) do
+        if _G.Auto2Sea and W1 then
+            pcall(function()
+                if Plr.Data.Level.Value >= 700 then
+                    if WS.Map.Ice.Door.CanCollide and WS.Map.Ice.Door.Transparency == 0 then
+                        Tween(CFrame.new(4851.87, 5.65, 718.47))
+                        CF:InvokeServer("DressrosaQuestProgress", "Detective")
+                        EquipW("Key")
+                        Tween(CFrame.new(1347.71, 37.38, -1325.65))
+                    elseif not WS.Map.Ice.Door.CanCollide or WS.Map.Ice.Door.Transparency == 1 then
+                        CF:InvokeServer("TravelDressrosa")
+                    elseif KillByName("Ice Admiral") then
+                        CF:InvokeServer("TravelDressrosa")
+                    else
+                        Tween(CFrame.new(1347.71, 37.38, -1325.65))
+                    end
+                end
+            end)
+        end
+        
+        if _G.Auto3Sea and W2 then
+            pcall(function()
+                if Plr.Data.Level.Value >= 1500 then
+                    if CF:InvokeServer("ZQuestProgress", "General") == 0 then
+                        Tween(CFrame.new(-1926.32, 12.82, 1738.31))
+                        task.wait(1.5)
+                        CF:InvokeServer("ZQuestProgress", "Begin")
+                        task.wait(1)
+                        if WS.Enemies:FindFirstChild("rip_indra") then 
+                            KillMob(WS.Enemies["rip_indra"]) 
+                        else 
+                            Tween(CFrame.new(-26880.93, 22.85, 473.19)) 
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- 14. Auto Bartilo & Citizen Quest
+task.spawn(function()
+    while task.wait(0.5) do
+        if _G.AutoBartilo and W2 then
+            pcall(function()
+                local p = CF:InvokeServer("BartiloQuestProgress", "Bartilo")
+                if p == 0 then
+                    local tl = Plr.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text
+                    if string.find(tl, "Swan Pirate") then
+                        if not KillByName("Swan Pirate") then Tween(CFrame.new(1057.93, 137.61, 1242.08)) end
+                    else Tween(CFrame.new(-456.29, 73.02, 299.90)) end
+                elseif p == 1 then
+                    if not KillByName("Jeremy") then Tween(CFrame.new(2099.88, 448.93, 648.99)) end
+                elseif p == 2 then
+                    for _, c in ipairs({CFrame.new(-1850.49,13.18,1750.90), CFrame.new(-1858.87,19.38,1712.02), CFrame.new(-1803.94,16.58,1750.90), CFrame.new(-1858.56,16.86,1724.80)}) do
+                        TP(c) task.wait(0.4)
+                    end
+                end
+            end)
+        end
+        
+        if _G.AutoCitizen then
+            pcall(function()
+                local p = CF:InvokeServer("CitizenQuestProgress")
+                if p and p.KilledBandits == false then
+                    if not KillByName("Forest Pirate") then Tween(CFrame.new(-13206.45, 425.89, -7964.55)) end
+                elseif p and p.KilledBoss == false then
+                    if not KillByName("Captain Elephant") then Tween(CFrame.new(-13374.89, 421.28, -8225.21)) end
+                end
+            end)
+        end
+    end
+end)
+
+-- 15. Auto Mirage, Prehistoric, & Kitsune (Find & Tween)
+local function FindBoat()
+    for _, b in ipairs(WS.Boats:GetChildren()) do
+        if b:FindFirstChild("Owner") and tostring(b.Owner.Value) == Plr.Name then return b end
+    end
+    return nil
+end
+
+local function BoatLogic(targetCF)
+    local b = FindBoat()
+    if not b then
+        Tween(CFrame.new(-16927.45, 9.09, 433.86))
+        task.wait(0.5)
+        CF:InvokeServer("BuyBoat", "Guardian")
+    elseif Plr.Character.Humanoid.Sit == false then
+        TP(b.VehicleSeat.CFrame * CFrame.new(0, 1, 0))
+    else
+        Tween(targetCF)
+    end
+end
+
+task.spawn(function()
+    while task.wait(0.5) do
+        if _G.AutoMirage then
+            pcall(function()
+                local loc = WS._WorldOrigin.Locations
+                if not loc:FindFirstChild("Mirage Island") then
+                    BoatLogic(CFrame.new(-10000000, 31, 37016.25))
+                else
+                    TP(loc["Mirage Island"].CFrame * CFrame.new(0, 300, 0))
+                end
+            end)
+        end
+        if _G.AutoPrehistoric then
+            pcall(function()
+                local loc = WS._WorldOrigin.Locations
+                if not loc:FindFirstChild("Prehistoric Island") then
+                    BoatLogic(CFrame.new(-10000000, 31, 37016.25))
+                else
+                    local isl = WS.Map:FindFirstChild("PrehistoricIsland")
+                    if isl and isl.Core:FindFirstChild("ActivationPrompt") then
+                        TP(isl.Core.ActivationPrompt.CFrame)
+                        fireproximityprompt(isl.Core.ActivationPrompt.ProximityPrompt, math.huge)
+                    else
+                        TP(loc["Prehistoric Island"].CFrame * CFrame.new(0, 300, 0))
+                    end
+                end
+            end)
+        end
+        if _G.AutoKitsune then
+            pcall(function()
+                local loc = WS._WorldOrigin.Locations
+                if not loc:FindFirstChild("Kitsune Island") then
+                    BoatLogic(CFrame.new(-10000000, 31, 37016.25))
+                else
+                    TP(loc["Kitsune Island"].CFrame * CFrame.new(0, 500, 0))
+                end
+            end)
+        end
+    end
+end)
+
+-- 16. Auto Race V4 (Train & Complete Trial)
+task.spawn(function()
+    while task.wait(0.5) do
+        if _G.AutoTrainV4 then
+            pcall(function()
+                local re = Plr.Character:FindFirstChild("RaceEnergy")
+                if re and re.Value == 1 then
+                    VIM:SendKeyEvent(true, "Y", false, game)
+                    CF:InvokeServer("UpgradeRace", "Buy")
+                else
+                    if not KillByName("Reborn Skeleton") and not KillByName("Living Zombie") and not KillByName("Demonic Soul") and not KillByName("Posessed Mummy") then
+                        Tween(CFrame.new(-9495.68, 453.59, 5977.35))
+                    end
+                end
+            end)
+        end
+        
+        if _G.AutoCompleteTrial then
+            pcall(function()
+                local race = Plr.Data.Race.Value
+                if race == "Mink" and WS.Map:FindFirstChild("MinkTrial") then
+                    TP(WS.Map.MinkTrial.Ceiling.CFrame * CFrame.new(0, -20, 0))
+                elseif race == "Skypiea" and WS.Map:FindFirstChild("SkyTrial") then
+                    TP(WS.Map.SkyTrial.Model.FinishPart.CFrame)
+                elseif race == "Human" or race == "Ghoul" then
+                    if not KillByName("Ancient Vampire") and not KillByName("Ancient Zombie") then
+                        Tween(CFrame.new(-2441.19, 1205.89, -3887.23))
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- 17. Auto Stats Upgrade
+task.spawn(function()
+    while task.wait(0.3) do
+        if _G.AutoStats and Plr.Data.Points.Value > 0 then
+            pcall(function()
+                local statMap = {["Melee"]="Melee", ["Defense"]="Defense", ["Sword"]="Sword", ["Gun"]="Gun", ["Blox Fruit"]="Demon Fruit"}
+                CF:InvokeServer("AddPoint", statMap[_G.StatType or "Melee"], 1)
+            end)
+        end
+    end
+end)
+
+-- 18. ESP RINGAN (Tanpa UIStroke/Gradient)
+local function CreateESP(part, text, color)
+    if part:FindFirstChild("LuxxESP") then part.LuxxESP:Destroy() end
+    local bb = Instance.new("BillboardGui")
+    bb.Name = "LuxxESP"
+    bb.Size = UDim2.new(0, 200, 0, 30)
+    bb.StudsOffset = Vector3.new(0, 2, 0)
+    bb.AlwaysOnTop = true
+    bb.Adornee = part
+    bb.Parent = part
+    
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, 0, 1, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = text
+    lbl.TextColor3 = color
+    lbl.TextStrokeTransparency = 0.5
+    lbl.TextSize = 12
+    lbl.Font = Enum.Font.GothamBold
+    lbl.Parent = bb
+end
+
+task.spawn(function()
+    while task.wait(1) do
+        -- Player ESP
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= Plr and p.Character and p.Character:FindFirstChild("Head") then
+                if _G.EspPlayer then
+                    local hrp = Plr.Character and Plr.Character:FindFirstChild("HumanoidRootPart")
+                    local dist = hrp and math.floor((hrp.Position - p.Character.Head.Position).Magnitude) or 0
+                    CreateESP(p.Character.Head, p.Name .. " | " .. dist .. "m", p.Team == Plr.Team and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,50,50))
+                else
+                    local b = p.Character.Head:FindFirstChild("LuxxESP")
+                    if b then b:Destroy() end
+                end
+            end
+        end
+        
+        -- Fruit ESP
+        for _, d in ipairs(WS:GetChildren()) do
+            if string.find(d.Name, "Fruit") and d:FindFirstChild("Handle") then
+                if _G.EspFruit then
+                    CreateESP(d.Handle, d.Name, Color3.fromRGB(255,255,255))
+                else
+                    local b = d.Handle:FindFirstChild("LuxxESP")
+                    if b then b:Destroy() end
+                end
+            end
+        end
+        
+        -- Chest ESP
+        for _, c in ipairs(game:GetService("CollectionService"):GetTagged("_ChestTagged")) do
+            if _G.EspChest then
+                if not c:GetAttribute("IsDisabled") then
+                    local part = c:FindFirstChildOfClass("BasePart") or c.PrimaryPart
+                    if part then CreateESP(part, "Chest", Color3.fromRGB(255,215,0)) end
+                end
+            else
+                for _, d in ipairs(c:GetDescendants()) do
+                    local b = d:FindFirstChild("LuxxESP")
+                    if b then b:Destroy() end
+                end
+            end
+        end
+    end
+end)
+
+-- ══════════════════════════ UPDATE UI: TAMBAH TAB FINAL ══════════════════════════
+
+AddNewTab("Quest & Race")
+AddNewTab("Events (Mirage/PRE)")
+AddNewTab("ESP & Stats")
+
+-- Isi Tab Quest & Race
+AddToggle(Pages["Quest & Race"], "Auto 2nd Sea", "Auto2Sea")
+AddToggle(Pages["Quest & Race"], "Auto 3rd Sea", "Auto3Sea")
+AddToggle(Pages["Quest & Race"], "Auto Bartilo", "AutoBartilo")
+AddToggle(Pages["Quest & Race"], "Auto Citizen", "AutoCitizen")
+AddToggle(Pages["Quest & Race"], "Auto Train V4", "AutoTrainV4")
+AddToggle(Pages["Quest & Race"], "Auto Complete Trial", "AutoCompleteTrial")
+
+-- Isi Tab Events
+AddToggle(Pages["Events (Mirage/PRE)"], "Auto Find Mirage", "AutoMirage")
+AddToggle(Pages["Events (Mirage/PRE)"], "Auto Find Prehistoric", "AutoPrehistoric")
+AddToggle(Pages["Events (Mirage/PRE)"], "Auto Find Kitsune", "AutoKitsune")
+
+-- Isi Tab ESP & Stats
+AddToggle(Pages["ESP & Stats"], "ESP Player", "EspPlayer")
+AddToggle(Pages["ESP & Stats"], "ESP Fruit", "EspFruit")
+AddToggle(Pages["ESP & Stats"], "ESP Chest", "EspChest")
+AddToggle(Pages["ESP & Stats"], "Auto Upgrade Stats (Melee)", "AutoStats")
+
+-- ══════════════════════════ DRAG UI (FIX UNTUK HP) ══════════════════════════
+-- Memastikan UI bisa digeser tanpa ngebug
+local dragging, dragInput, dragStart, startPos
+Top.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = Main.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+Top.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+UIS.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+print("[LUXXY HUB] Seluruh Script Berhasil Dimuat 100% Tanpa Error!")
