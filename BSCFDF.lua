@@ -309,10 +309,9 @@ end
 -- ═══════════════════════════════════════════════════════════════
 local function startCarTool()
     if _G.BSTS_LuxxyHub_Cleanup then pcall(_G.BSTS_LuxxyHub_Cleanup) end
-    local activeConnections, activeInstances = {}, {}
-    _G.BSTS_LuxxyHub_Cleanup = function()
+        _G.BSTS_LuxxyHub_Cleanup = function()
         for _, c in pairs(activeConnections) do pcall(function() c:Disconnect() end) end
-        for _, i in pairs(activeInstances) do pcall(function() if i and i.Parent then i:Destroy() end) end
+        for _, i in pairs(activeInstances) do pcall(function() i:Destroy() end) end
         activeConnections, activeInstances = {}, {}
     end
     local function bind(sig, cb) local c = sig:Connect(cb); table.insert(activeConnections, c); return c end
