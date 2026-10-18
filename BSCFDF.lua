@@ -1,6 +1,6 @@
 -- ═══════════════════════════════════════════════════════════════
 -- BSTS-ID - LuxxyHub
--- v4.1 (Mono Edition — Black & White, Static Gradient Border)
+-- v4.2 (Mono Edition — Full Auto-Farm / Auto-Spawn / Auto-Sit)
 -- PlaceId: 114375429517112
 -- ═══════════════════════════════════════════════════════════════
 
@@ -63,8 +63,8 @@ local COLOR = {
     Text = Color3.fromRGB(240, 240, 240),  -- Putih tulang
     TextDim = Color3.fromRGB(150, 150, 150),-- Abu-abu terang
     
-    Error = Color3.fromRGB(220, 60, 60),   -- Merah (buat hapus/error)
-    Success = Color3.fromRGB(80, 200, 100),-- Hijau (buat sukses)
+    Error = Color3.fromRGB(220, 60, 60),   -- Merah
+    Success = Color3.fromRGB(80, 200, 100),-- Hijau
 }
 
 local function new(class, props)
@@ -112,7 +112,7 @@ local _pgCheck = LocalPlayer:FindFirstChild("PlayerGui")
 if not _pgCheck then LocalPlayer:WaitForChild("PlayerGui", 5) end
 
 -- ═══════════════════════════════════════════════════════════════
--- 🖼️ STATIC GRADIENT BORDER (Ganti Animated Border)
+-- 🖼️ STATIC GRADIENT BORDER
 -- ═══════════════════════════════════════════════════════════════
 local function createStaticGradientBorder(parent, thickness)
     local stroke = Instance.new("UIStroke")
@@ -122,9 +122,9 @@ local function createStaticGradientBorder(parent, thickness)
 
     local grad = Instance.new("UIGradient")
     grad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), -- Putih
-        ColorSequenceKeypoint.new(0.50, Color3.fromRGB(80, 80, 80)),    -- Abu gelap
-        ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 255, 255)), -- Putih
+        ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+        ColorSequenceKeypoint.new(0.50, Color3.fromRGB(80, 80, 80)),
+        ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 255, 255)),
     })
     grad.Rotation = 45
     grad.Parent = stroke
@@ -189,6 +189,7 @@ local defaultConfig = {
     savedPositions = {}, slotCounter = 0,
     destinationCache = {},
     autoFarmDestination = nil,
+    autoFarmTruck = nil,       -- Menyimpan pilihan truck buat farm
     loadPointCache = {},
     favoriteTrucks = {},
     disabledFarmTrucks = {},
@@ -270,7 +271,6 @@ end
 local function startCarTool()
     if _G.BSTS_LuxxyHub_Cleanup then pcall(_G.BSTS_LuxxyHub_Cleanup) end
     
-    -- FIX BUG NIL: Paksa deklarasi tabel di sini
     local activeConnections = {}
     local activeInstances = {}
 
@@ -328,7 +328,6 @@ local function startCarTool()
         end
     end)
 
-    -- ═══ TOGGLE POSITION VALIDATION ═══
     local TOGGLE_SIZE = 60
     local TOGGLE_MARGIN = 10
 
@@ -371,14 +370,12 @@ local function startCarTool()
         markSaveDirty()
     end
 
-    -- ═══ VEHICLE DETECTION ═══
     local function findNearestCar()
         local char = LocalPlayer.Character
         if not char then return nil end
         local hrp = char:FindFirstChild("HumanoidRootPart")
         if not hrp then return nil end
         local nearestTarget, shortestDist = nil, math.huge
-        local targetType = "unknown"
 
         for _, obj in pairs(workspace:GetDescendants()) do
             if obj:IsA("VehicleSeat") then
@@ -393,7 +390,6 @@ local function startCarTool()
                         if cur:IsA("Model") then root = cur end
                     end
                     nearestTarget = root
-                    targetType = "mobil"
                 end
             end
         end
@@ -411,7 +407,6 @@ local function startCarTool()
                             if dist < shortestDist then
                                 shortestDist = dist
                                 nearestTarget = obj
-                                targetType = "trailer"
                             end
                         end
                     end
@@ -419,10 +414,6 @@ local function startCarTool()
             end
         end
 
-        if nearestTarget then
-            print(string.format("[BSTS-ID] Target: %s | %s | jarak %d",
-                nearestTarget.Name, targetType, math.floor(shortestDist)))
-        end
         return nearestTarget
     end
 
@@ -471,16 +462,20 @@ local function startCarTool()
 
     local function isDrivingFarmTruck()
         local vehicle, names = getDrivenVehicle()
+        if not vehicle then return false, nil end
         if #names == 0 then return false, nil end
 
-        local whitelist = CONFIG.FarmTruckWhitelist or {}
-        local vehicleNameNorm = vehicle and normalizeTruckName(vehicle.Name) or ""
-        for _, d in ipairs(userConfig.disabledFarmTrucks or {}) do
-            if vehicleNameNorm:find(normalizeTruckName(d), 1, true) then
-                return false, vehicle
+        -- 1. Cek apakah yang kita tumpangi sekarang adalah truck pilihan auto farm
+        if userConfig.autoFarmTruck then
+            for _, name in ipairs(names) do
+                if truckNameMatches(name, userConfig.autoFarmTruck) then
+                    return true, vehicle
+                end
             end
         end
 
+        -- 2. Fallback: Cek whitelist
+        local whitelist = CONFIG.FarmTruckWhitelist or {}
         for _, name in ipairs(names) do
             local nameNorm = normalizeTruckName(name)
             for _, kw in ipairs(whitelist) do
@@ -506,8 +501,11 @@ local function startCarTool()
 
     local function teleportCarToPos(pos)
         if not pos then return end
-        local vehicle = targetVehicleRoot or getDrivenVehicle()
+        -- Prioritaskan mobil yang lagi ditumpangi
+        local vehicle, _ = getDrivenVehicle()
+        if not vehicle then vehicle = targetVehicleRoot end
         if not vehicle then return end
+        
         local primaryPart = vehicle.PrimaryPart or vehicle:FindFirstChildWhichIsA("BasePart")
         if not primaryPart then
             for _, d in pairs(vehicle:GetDescendants()) do
@@ -621,9 +619,6 @@ local function startCarTool()
         return nil
     end
 
-    -- ═══════════════════════════════════════════════════════════
-    -- DESTINATION POINT DETECTOR
-    -- ═══════════════════════════════════════════════════════════
     local function scanDestinationPoints()
         local folder = workspace:FindFirstChild(CONFIG.DestinationFolder)
         if not folder then
@@ -697,14 +692,10 @@ local function startCarTool()
             end
         end
         if not target then return false end
-        print("[BSTS-ID] TP destinasi: " .. target.name)
         teleportCarToPos(target.position + Vector3.new(0, 3, 0))
         return true
     end
 
-    -- ═══════════════════════════════════════════════════════════
-    -- LOADING POINT DETECTOR + FAR-LOAD
-    -- ═══════════════════════════════════════════════════════════
     local function scanLoadingPoints()
         local folder = workspace:FindFirstChild(CONFIG.LoadFolder) or workspace
         local results = {}
@@ -750,7 +741,9 @@ local function startCarTool()
         end
         if not target then return false end
 
-        local vehicle = targetVehicleRoot or findNearestCar()
+        local vehicle, _ = getDrivenVehicle()
+        if not vehicle then vehicle = targetVehicleRoot end
+        if not vehicle then vehicle = findNearestCar() end
         if not vehicle then return false end
 
         local char = LocalPlayer.Character
@@ -821,9 +814,6 @@ local function startCarTool()
         return true
     end
 
-    -- ═══════════════════════════════════════════════════════════
-    -- TRUCK DATA + SPAWNER
-    -- ═══════════════════════════════════════════════════════════
     local function loadTruckData()
         local trucks = {}
         local RS = game:GetService("ReplicatedStorage")
@@ -905,6 +895,70 @@ local function startCarTool()
         return false
     end
 
+    -- ═══════════════════════════════════════════════════════════
+    -- 🤖 AUTO SPAWN & AUTO SIT (Full Otomatis)
+    -- ═══════════════════════════════════════════════════════════
+    local function autoSpawnAndSit(truckName, statusLbl)
+        if not truckName then return false end
+        
+        if statusLbl then 
+            statusLbl.Text = "🗑 Menghapus truck lama..." 
+            statusLbl.TextColor3 = COLOR.White
+        end
+        removeAllTrucks()
+        task.wait(1.5)
+        
+        if statusLbl then 
+            statusLbl.Text = "🚀 Spawn " .. truckName .. "..." 
+            statusLbl.TextColor3 = COLOR.White
+        end
+        spawnTruckByName(truckName)
+        task.wait(3) -- Tunggu server spawn truck
+        
+        local char = LocalPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if not hrp or not hum then return false end
+
+        -- Cari kursi (VehicleSeat) terdekat
+        local nearestSeat = nil
+        local shortestDist = math.huge
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("VehicleSeat") then
+                local dist = (obj.Position - hrp.Position).Magnitude
+                if dist < shortestDist then
+                    shortestDist = dist
+                    nearestSeat = obj
+                end
+            end
+        end
+
+        if nearestSeat then
+            if statusLbl then 
+                statusLbl.Text = "🧍 Duduk di " .. nearestSeat.Parent.Name 
+                statusLbl.TextColor3 = COLOR.White
+            end
+            
+            -- Paksa duduk dengan TP ke atas kursi
+            hrp.CFrame = nearestSeat.CFrame * CFrame.new(0, 3, 0)
+            task.wait(0.5)
+            hum.Sit = true
+            task.wait(1)
+            
+            if hum.SeatPart == nearestSeat then
+                return true
+            else
+                -- Coba sekali lagi
+                hrp.CFrame = nearestSeat.CFrame
+                task.wait(0.2)
+                hum.Sit = true
+                task.wait(1)
+                return hum.SeatPart == nearestSeat
+            end
+        end
+        return false
+    end
+
     local function toggleFly()
         flyEnabled = not flyEnabled
         local char = LocalPlayer.Character
@@ -976,13 +1030,40 @@ local function startCarTool()
         farmThread = task.spawn(function()
             while farmEnabled do
                 local isDriving = isDrivingFarmTruck()
+                
                 if not isDriving then
-                    if statusLbl then
-                        statusLbl.Text = "⚠️ Nyetir truck yang support farm"
-                        statusLbl.TextColor3 = COLOR.Error
+                    -- AUTO SPAWN & SIT
+                    local targetTruck = userConfig.autoFarmTruck
+                    if not targetTruck then
+                        -- Ambil truck pertama yang aktif di whitelist
+                        for _, t in ipairs(CONFIG.FarmTruckWhitelist) do
+                            if not isTruckDisabled(t) then
+                                targetTruck = t
+                                break
+                            end
+                        end
                     end
-                    task.wait(1.5)
+                    
+                    if not targetTruck then
+                        if statusLbl then
+                            statusLbl.Text = "❌ Semua truck dimatikan"
+                            statusLbl.TextColor3 = COLOR.Error
+                        end
+                        task.wait(3)
+                    else
+                        local success = autoSpawnAndSit(targetTruck, statusLbl)
+                        if not success then
+                            if statusLbl then
+                                statusLbl.Text = "❌ Gagal spawn. Pastikan di jalan."
+                                statusLbl.TextColor3 = COLOR.Error
+                            end
+                            task.wait(3)
+                        else
+                            task.wait(1)
+                        end
+                    end
                 else
+                    -- LOOP FARM
                     local pos19 = getSlot19Pos()
                     local pos20 = getSlot20Pos()
 
@@ -1164,7 +1245,7 @@ local function startCarTool()
         Text = "BSTS-ID - LuxxyHub", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack,
         TextSize = 15, TextXAlignment = Enum.TextXAlignment.Left, Parent = Header})
     new("TextLabel", {Size = UDim2.new(1,-90,0,12), Position = UDim2.new(0,50,1,-15), BackgroundTransparency = 1,
-        Text = "Mono Edition v4.1", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 9,
+        Text = "Mono Edition v4.2", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 9,
         TextXAlignment = Enum.TextXAlignment.Left, Parent = Header})
     local CloseBtn = new("TextButton", {Size = UDim2.new(0,26,0,26), Position = UDim2.new(1,-34,0,12),
         BackgroundColor3 = COLOR.GreyDark, Text = "✕", TextColor3 = COLOR.White,
@@ -1202,7 +1283,6 @@ local function startCarTool()
         return btn, lbl
     end
 
-    -- ═══ SAVE POSISI BUTTON ═══
     local SaveBtn, SaveLbl = makePremiumBtn(Content, "💾  Save Posisi ke Slot Baru", COLOR.GreyDark, COLOR.Black)
     SaveBtn.LayoutOrder = 1
     local FindBtn, FindLbl = makePremiumBtn(Content, "🔍  Cari Target Terdekat", COLOR.GreyDark, COLOR.Black)
@@ -1298,7 +1378,7 @@ local function startCarTool()
 
     -- ═══ AUTO FARM SECTION ═══
     new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1,
-        Text = "🌾  AUTO FARM", TextColor3 = COLOR.White,
+        Text = "🌾  AUTO FARM (FULL AUTO)", TextColor3 = COLOR.White,
         Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left,
         LayoutOrder = 6, ZIndex = 120, Parent = Content})
 
@@ -1321,6 +1401,7 @@ local function startCarTool()
         BackgroundColor3 = Color3.fromRGB(255,255,255), BorderSizePixel = 0, ZIndex = 132, Parent = SwitchBg})
     corner(SwitchKnob, 11)
 
+    local farmToggleActive = false
     local function setSwitchVisual(on)
         if on then
             tween(SwitchBg, {BackgroundColor3 = COLOR.White}, 0.2):Play()
@@ -1552,7 +1633,7 @@ local function startCarTool()
         })
 
         local spawnBtn = new("TextButton", {
-            Size = UDim2.new(1,-8,0,18), Position = UDim2.new(0,4,1,-22),
+            Size = UDim2.new(0.55,-3,0,18), Position = UDim2.new(0,4,1,-22),
             BackgroundColor3 = COLOR.White,
             BorderSizePixel = 0,
             Text = "🚀 Spawn",
@@ -1562,6 +1643,18 @@ local function startCarTool()
             ZIndex = 123, Parent = card,
         })
         corner(spawnBtn, 5)
+
+        local farmBtn = new("TextButton", {
+            Size = UDim2.new(0.4,-8,0,18), Position = UDim2.new(0.6,4,1,-22),
+            BackgroundColor3 = COLOR.Success,
+            BorderSizePixel = 0,
+            Text = "🌾 Farm",
+            TextColor3 = COLOR.Black,
+            Font = Enum.Font.GothamBold, TextSize = 9,
+            AutoButtonColor = false,
+            ZIndex = 123, Parent = card,
+        })
+        corner(farmBtn, 5)
 
         local favBtn = new("TextButton", {
             Size = UDim2.new(0,22,0,22), Position = UDim2.new(1,-24,0,2),
@@ -1582,6 +1675,18 @@ local function startCarTool()
             spawnBtn.Text = "✅ OK"
             task.wait(0.8)
             spawnBtn.Text = "🚀 Spawn"
+        end)
+
+        farmBtn.MouseButton1Click:Connect(function()
+            userConfig.autoFarmTruck = truck.name
+            markSaveDirty()
+            
+            farmToggleActive = true
+            setSwitchVisual(true)
+            stopFarm()
+            startFarm(StatusLabel)
+            StatusLabel.Text = "Status: Auto-Farm Full " .. truck.name
+            StatusLabel.TextColor3 = COLOR.Success
         end)
 
         favBtn.MouseButton1Click:Connect(function()
@@ -1944,184 +2049,4 @@ local function startCarTool()
         end
         local loads = scanLoadingPoints()
         if #loads == 0 then
-            LoadEmptyLabel.Visible = true
-            LoadStatus.Text = "❌ 0 loading point"
-            LoadStatus.TextColor3 = COLOR.Error
-        else
-            LoadEmptyLabel.Visible = false
-            LoadStatus.Text = "✅ " .. #loads .. " loading point"
-            LoadStatus.TextColor3 = COLOR.Success
-            for i, l in ipairs(loads) do
-                pcall(buildLoadRow, l, i)
-            end
-        end
-        LoadList.CanvasSize = UDim2.new(0, 0, 0, #loads * 60 + 12)
-    end
-
-    task.spawn(function()
-        task.wait(2)
-        pcall(refreshLoadList)
-    end)
-
-    ScanLoadBtn.MouseButton1Click:Connect(function()
-        ScanLoadBtn.Text = "⏳ Scan..."
-        pcall(refreshLoadList)
-        ScanLoadBtn.Text = "✅ Selesai!"
-        task.wait(1.2); ScanLoadBtn.Text = "🔄 Scan Muatan"
-    end)
-
-    -- ═══ FLY SECTION ═══
-    new("Frame", {Size = UDim2.new(1,0,0,1), BackgroundColor3 = COLOR.White,
-        BackgroundTransparency = 0.8, BorderSizePixel = 0, LayoutOrder = 8, ZIndex = 120, Parent = Content})
-
-    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1,
-        Text = "✈️  FLY MODE", TextColor3 = COLOR.White,
-        Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left,
-        LayoutOrder = 9, ZIndex = 120, Parent = Content})
-    local FlyBtn, FlyLbl = makePremiumBtn(Content, "✈️  Fly: OFF", COLOR.GreyDark, COLOR.Black)
-    FlyBtn.LayoutOrder = 10
-
-    local FlySpeedRow = new("Frame", {Size = UDim2.new(1,0,0,38), BackgroundColor3 = COLOR.BG2,
-        BackgroundTransparency = 0.4, BorderSizePixel = 0, LayoutOrder = 11, ZIndex = 120, Parent = Content})
-    corner(FlySpeedRow, 8)
-    new("TextLabel", {Size = UDim2.new(0.42,0,1,0), Position = UDim2.new(0,10,0,0),
-        BackgroundTransparency = 1, Text = "✈️ Fly Speed:", TextColor3 = COLOR.White,
-        Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left,
-        ZIndex = 130, Parent = FlySpeedRow})
-    local FlySpeedBox = new("TextBox", {Size = UDim2.new(0.52,0,1,-8), Position = UDim2.new(0.44,0,0,4),
-        BackgroundColor3 = COLOR.Black, PlaceholderText = "Default: 60", Text = tostring(flySpeed),
-        TextColor3 = COLOR.White, PlaceholderColor3 = COLOR.TextDim,
-        Font = Enum.Font.GothamBold, TextSize = 12, BorderSizePixel = 0, ZIndex = 130, Parent = FlySpeedRow})
-    corner(FlySpeedBox, 6)
-    new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = FlySpeedBox})
-
-    local StatusLabel = new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1,
-        Text = "Status: Siap digunakan", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham,
-        TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left,
-        LayoutOrder = 12, ZIndex = 120, Parent = Content})
-
-    -- ═══ OPEN/CLOSE ═══
-    local isAnimating = false
-    local function openGUI()
-        if MainWrapper.Visible or isAnimating then return end
-        isAnimating = true
-        MainWrapper.Visible = true
-        MainWrapper.Size = UDim2.new(0,0,0,0)
-        MainFrame.BackgroundTransparency = 1
-        pcall(function()
-            tween(MainWrapper, {Size = UDim2.new(0,guiW,0,guiH)}, 0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out):Play()
-            tween(MainFrame, {BackgroundTransparency = 0}, 0.3):Play()
-        end)
-        task.wait(0.4); isAnimating = false
-    end
-    local function closeGUI()
-        if not MainWrapper.Visible or isAnimating then return end
-        isAnimating = true
-        pcall(function()
-            tween(MainWrapper, {Size = UDim2.new(0,0,0,0)}, 0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
-            tween(MainFrame, {BackgroundTransparency = 1}, 0.2):Play()
-        end)
-        task.wait(0.3)
-        MainWrapper.Visible = false
-        MainWrapper.Size = UDim2.new(0,guiW,0,guiH)
-        MainFrame.BackgroundTransparency = 0
-        isAnimating = false
-    end
-    local function toggleGUI()
-        if MainWrapper.Visible then closeGUI() else openGUI() end
-    end
-
-    bind(ToggleBtn.MouseButton1Click, function()
-        if hasMoved then return end
-        toggleGUI()
-    end)
-    bind(CloseBtn.MouseButton1Click, closeGUI)
-
-    bind(SaveBtn.MouseButton1Click, function()
-        local char = LocalPlayer.Character
-        if not char then return end
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
-        slotCounter = slotCounter + 1
-        table.insert(savedPositions, {name = "Slot " .. slotCounter, pos = hrp.Position})
-        markSaveDirty(); refreshPositionList()
-        SaveLbl.Text = "✅  Tersimpan (Slot " .. slotCounter .. ")"
-        StatusLabel.Text = "Status: Disave ke Slot " .. slotCounter
-        task.wait(1.2); SaveLbl.Text = "💾  Save Posisi ke Slot Baru"
-    end)
-
-    bind(FindBtn.MouseButton1Click, function()
-        targetVehicleRoot = findNearestCar()
-        if targetVehicleRoot then
-            FindLbl.Text = "✅  " .. targetVehicleRoot.Name
-            StatusLabel.Text = "Status: Target ditemukan"
-        else
-            FindLbl.Text = "❌  Tidak ada target"
-            StatusLabel.Text = "Status: Tidak ada target"
-        end
-        task.wait(1.5); FindLbl.Text = "🔍  Cari Target Terdekat"
-    end)
-
-    local farmToggleActive = false
-    bind(SwitchBtn.MouseButton1Click, function()
-        farmToggleActive = not farmToggleActive
-        setSwitchVisual(farmToggleActive)
-        if farmToggleActive then
-            startFarm(StatusLabel)
-        else
-            stopFarm()
-            StatusLabel.Text = "Status: Siap digunakan"
-            StatusLabel.TextColor3 = COLOR.TextDim
-        end
-    end)
-
-    bind(FlyBtn.MouseButton1Click, function()
-        toggleFly()
-        if flyEnabled then
-            FlyLbl.Text = "✈️  Fly: ON"; FlyBtn.BackgroundColor3 = COLOR.White; FlyLbl.TextColor3 = COLOR.Black
-            StatusLabel.Text = "Status: Fly aktif"
-        else
-            FlyLbl.Text = "✈️  Fly: OFF"; FlyBtn.BackgroundColor3 = COLOR.GreyDark; FlyLbl.TextColor3 = COLOR.White
-            StatusLabel.Text = "Status: Fly nonaktif"
-        end
-    end)
-
-    bind(FlySpeedBox.FocusLost, function()
-        local v = tonumber(FlySpeedBox.Text)
-        if v and v > 0 and v <= 500 then
-            flySpeed = v; markSaveDirty(); StatusLabel.Text = "Status: Fly speed → " .. v
-        else
-            FlySpeedBox.Text = tostring(flySpeed); StatusLabel.Text = "⚠️ Fly speed harus 1-500"
-        end
-    end)
-
-    bind(UserInputService.InputBegan, function(input, gp)
-        if gp then return end
-        if input.KeyCode == Enum.KeyCode.T then
-            if not targetVehicleRoot then targetVehicleRoot = findNearestCar() end
-            if #savedPositions > 0 then teleportCarToPos(savedPositions[#savedPositions].pos) end
-        elseif input.KeyCode == Enum.KeyCode.F then
-            toggleFly()
-            if flyEnabled then FlyLbl.Text = "✈️  Fly: ON"; FlyBtn.BackgroundColor3 = COLOR.White; FlyLbl.TextColor3 = COLOR.Black
-            else FlyLbl.Text = "✈️  Fly: OFF"; FlyBtn.BackgroundColor3 = COLOR.GreyDark; FlyLbl.TextColor3 = COLOR.White end
-        elseif input.KeyCode == Enum.KeyCode.RightControl then
-            toggleGUI()
-        end
-    end)
-
-    print("[BSTS-ID] ✅ v4.1 Mono Edition siap!")
-end
-
--- ═══════════════════════════════════════════════════════════════
--- ENTRY
--- ═══════════════════════════════════════════════════════════════
-task.spawn(function()
-    if not isBSTSGame() then
-        print("[BSTS-ID] Map tidak sesuai: " .. game.Name)
-        buildWrongMapUI(); return
-    end
-    print("[BSTS-ID] Game terdeteksi. Loading v4.1...")
-    startCarTool()
-end)
-
-print("[BSTS-ID - LuxxyHub] v4.1 Mono Edition Loaded! ✨")
+            LoadEmptyLabel
