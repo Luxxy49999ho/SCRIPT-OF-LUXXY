@@ -1,6 +1,6 @@
 -- ═══════════════════════════════════════════════════════════════
 -- BSTS-ID - LuxxyHub
--- v4.2 (Mono Edition — Full Auto-Farm / Auto-Spawn / Auto-Sit)
+-- v4.3 (Mono Glossy Edition — Full Auto-Farm & Auto-Sit)
 -- PlaceId: 114375429517112
 -- ═══════════════════════════════════════════════════════════════
 
@@ -58,13 +58,13 @@ local COLOR = {
     GreyMed = Color3.fromRGB(60, 60, 60),
     GreyLight = Color3.fromRGB(150, 150, 150),
     
-    BG = Color3.fromRGB(10, 10, 10),       -- Hitam pekat
-    BG2 = Color3.fromRGB(25, 25, 25),      -- Hitam keabu-abuan
-    Text = Color3.fromRGB(240, 240, 240),  -- Putih tulang
-    TextDim = Color3.fromRGB(150, 150, 150),-- Abu-abu terang
+    BG = Color3.fromRGB(10, 10, 10),       
+    BG2 = Color3.fromRGB(25, 25, 25),      
+    Text = Color3.fromRGB(240, 240, 240),  
+    TextDim = Color3.fromRGB(150, 150, 150),
     
-    Error = Color3.fromRGB(220, 60, 60),   -- Merah
-    Success = Color3.fromRGB(80, 200, 100),-- Hijau
+    Error = Color3.fromRGB(220, 60, 60),   
+    Success = Color3.fromRGB(80, 200, 100),
 }
 
 local function new(class, props)
@@ -112,9 +112,9 @@ local _pgCheck = LocalPlayer:FindFirstChild("PlayerGui")
 if not _pgCheck then LocalPlayer:WaitForChild("PlayerGui", 5) end
 
 -- ═══════════════════════════════════════════════════════════════
--- 🖼️ STATIC GRADIENT BORDER
+-- 🖼️ GLOSSY BORDER & EFFECT
 -- ═══════════════════════════════════════════════════════════════
-local function createStaticGradientBorder(parent, thickness)
+local function createGlossyBorder(parent, thickness)
     local stroke = Instance.new("UIStroke")
     stroke.Thickness = thickness or 2
     stroke.Color = Color3.fromRGB(255, 255, 255)
@@ -123,12 +123,34 @@ local function createStaticGradientBorder(parent, thickness)
     local grad = Instance.new("UIGradient")
     grad.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
-        ColorSequenceKeypoint.new(0.50, Color3.fromRGB(80, 80, 80)),
-        ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 255, 255)),
+        ColorSequenceKeypoint.new(0.50, Color3.fromRGB(150, 150, 150)),
+        ColorSequenceKeypoint.new(1.00, Color3.fromRGB(50, 50, 50)),
     })
     grad.Rotation = 45
     grad.Parent = stroke
     return stroke
+end
+
+local function createGlassEffect(parent)
+    -- Efek mengkilap (pantulan cahaya di atas)
+    local glass = Instance.new("Frame")
+    glass.Size = UDim2.new(1, 0, 0.5, 0)
+    glass.Position = UDim2.new(0, 0, 0, 0)
+    glass.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    glass.BackgroundTransparency = 0.9
+    glass.BorderSizePixel = 0
+    glass.ZIndex = parent.ZIndex - 1
+    glass.Parent = parent
+    corner(glass, 18)
+
+    local grad = Instance.new("UIGradient")
+    grad.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0.85),
+        NumberSequenceKeypoint.new(1, 1)
+    })
+    grad.Rotation = 90
+    grad.Parent = glass
+    return glass
 end
 
 -- ═══════════════════════════════════════════════════════════════
@@ -189,7 +211,7 @@ local defaultConfig = {
     savedPositions = {}, slotCounter = 0,
     destinationCache = {},
     autoFarmDestination = nil,
-    autoFarmTruck = nil,       -- Menyimpan pilihan truck buat farm
+    autoFarmTruck = nil,       
     loadPointCache = {},
     favoriteTrucks = {},
     disabledFarmTrucks = {},
@@ -253,7 +275,8 @@ local function buildWrongMapUI()
     local Main = new("Frame", {Size = UDim2.new(1,0,1,0), BackgroundColor3 = COLOR.BG,
         BorderSizePixel = 0, Active = true, Draggable = true, ZIndex = 10, Parent = MainWrapper})
     corner(Main, 18)
-    createStaticGradientBorder(Main, 3)
+    createGlossyBorder(Main, 3)
+    createGlassEffect(Main)
     new("TextLabel", {Size = UDim2.new(1,-40,0,40), Position = UDim2.new(0,20,0,20), BackgroundTransparency = 1,
         Text = "MAP TIDAK SESUAI", TextColor3 = COLOR.Error, Font = Enum.Font.GothamBold, TextSize = 22,
         TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 20, Parent = Main})
@@ -465,7 +488,6 @@ local function startCarTool()
         if not vehicle then return false, nil end
         if #names == 0 then return false, nil end
 
-        -- 1. Cek apakah yang kita tumpangi sekarang adalah truck pilihan auto farm
         if userConfig.autoFarmTruck then
             for _, name in ipairs(names) do
                 if truckNameMatches(name, userConfig.autoFarmTruck) then
@@ -474,7 +496,6 @@ local function startCarTool()
             end
         end
 
-        -- 2. Fallback: Cek whitelist
         local whitelist = CONFIG.FarmTruckWhitelist or {}
         for _, name in ipairs(names) do
             local nameNorm = normalizeTruckName(name)
@@ -501,7 +522,6 @@ local function startCarTool()
 
     local function teleportCarToPos(pos)
         if not pos then return end
-        -- Prioritaskan mobil yang lagi ditumpangi
         local vehicle, _ = getDrivenVehicle()
         if not vehicle then vehicle = targetVehicleRoot end
         if not vehicle then return end
@@ -895,9 +915,6 @@ local function startCarTool()
         return false
     end
 
-    -- ═══════════════════════════════════════════════════════════
-    -- 🤖 AUTO SPAWN & AUTO SIT (Full Otomatis)
-    -- ═══════════════════════════════════════════════════════════
     local function autoSpawnAndSit(truckName, statusLbl)
         if not truckName then return false end
         
@@ -913,14 +930,13 @@ local function startCarTool()
             statusLbl.TextColor3 = COLOR.White
         end
         spawnTruckByName(truckName)
-        task.wait(3) -- Tunggu server spawn truck
+        task.wait(3) 
         
         local char = LocalPlayer.Character
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
         local hum = char and char:FindFirstChildOfClass("Humanoid")
         if not hrp or not hum then return false end
 
-        -- Cari kursi (VehicleSeat) terdekat
         local nearestSeat = nil
         local shortestDist = math.huge
         for _, obj in pairs(workspace:GetDescendants()) do
@@ -938,8 +954,6 @@ local function startCarTool()
                 statusLbl.Text = "🧍 Duduk di " .. nearestSeat.Parent.Name 
                 statusLbl.TextColor3 = COLOR.White
             end
-            
-            -- Paksa duduk dengan TP ke atas kursi
             hrp.CFrame = nearestSeat.CFrame * CFrame.new(0, 3, 0)
             task.wait(0.5)
             hum.Sit = true
@@ -948,7 +962,6 @@ local function startCarTool()
             if hum.SeatPart == nearestSeat then
                 return true
             else
-                -- Coba sekali lagi
                 hrp.CFrame = nearestSeat.CFrame
                 task.wait(0.2)
                 hum.Sit = true
@@ -1032,10 +1045,8 @@ local function startCarTool()
                 local isDriving = isDrivingFarmTruck()
                 
                 if not isDriving then
-                    -- AUTO SPAWN & SIT
                     local targetTruck = userConfig.autoFarmTruck
                     if not targetTruck then
-                        -- Ambil truck pertama yang aktif di whitelist
                         for _, t in ipairs(CONFIG.FarmTruckWhitelist) do
                             if not isTruckDisabled(t) then
                                 targetTruck = t
@@ -1063,7 +1074,6 @@ local function startCarTool()
                         end
                     end
                 else
-                    -- LOOP FARM
                     local pos19 = getSlot19Pos()
                     local pos20 = getSlot20Pos()
 
@@ -1105,7 +1115,7 @@ local function startCarTool()
     end
 
     -- ═══════════════════════════════════════════════════════════
-    -- UI BUILDER (MONO THEME)
+    -- UI BUILDER (MONO GLOSSY)
     -- ═══════════════════════════════════════════════════════════
     local cam = workspace.CurrentCamera
     local vp = (cam and cam.ViewportSize) or Vector2.new(1280, 720)
@@ -1142,7 +1152,8 @@ local function startCarTool()
         Active = true, ZIndex = 202, Parent = ToggleWrapper,
     })
     corner(ToggleBtn, 30)
-    createStaticGradientBorder(ToggleBtn, 2)
+    createGlossyBorder(ToggleBtn, 2)
+    createGlassEffect(ToggleBtn)
     new("ImageLabel", {
         Size = UDim2.new(0.75, 0, 0.75, 0),
         Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -1221,7 +1232,8 @@ local function startCarTool()
         ZIndex = 100, Parent = MainWrapper,
     }))
     corner(MainFrame, 18)
-    createStaticGradientBorder(MainFrame, 2)
+    createGlossyBorder(MainFrame, 2)
+    createGlassEffect(MainFrame)
 
     bind(MainFrame:GetPropertyChangedSignal("Position"), function()
         if MainWrapper.Visible then
@@ -1245,7 +1257,7 @@ local function startCarTool()
         Text = "BSTS-ID - LuxxyHub", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack,
         TextSize = 15, TextXAlignment = Enum.TextXAlignment.Left, Parent = Header})
     new("TextLabel", {Size = UDim2.new(1,-90,0,12), Position = UDim2.new(0,50,1,-15), BackgroundTransparency = 1,
-        Text = "Mono Edition v4.2", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 9,
+        Text = "Mono Glossy v4.3", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 9,
         TextXAlignment = Enum.TextXAlignment.Left, Parent = Header})
     local CloseBtn = new("TextButton", {Size = UDim2.new(0,26,0,26), Position = UDim2.new(1,-34,0,12),
         BackgroundColor3 = COLOR.GreyDark, Text = "✕", TextColor3 = COLOR.White,
@@ -1264,8 +1276,8 @@ local function startCarTool()
         local btn = new("TextButton", {Size = UDim2.new(1,0,0,h), BackgroundColor3 = COLOR.GreyDark,
             Text = "", BorderSizePixel = 0, AutoButtonColor = false, ZIndex = 120, Parent = parent})
         corner(btn, 10)
-        local s = new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = btn})
-        new("UIGradient", {Color = ColorSequence.new(COLOR.GreyDark, COLOR.Black), Rotation = 90, Parent = btn})
+        createGlossyBorder(btn, 1)
+        createGlassEffect(btn)
         
         local lbl = new("TextLabel", {Size = UDim2.new(1,-20,1,0), Position = UDim2.new(0,10,0,0),
             BackgroundTransparency = 1, Text = text, TextColor3 = COLOR.White,
@@ -1274,11 +1286,9 @@ local function startCarTool()
         
         btn.MouseEnter:Connect(function() pcall(function()
             tween(btn, {Size = UDim2.new(1.02,0,0,h)}, 0.2):Play()
-            tween(s, {Transparency = 0.1}, 0.2):Play()
         end) end)
         btn.MouseLeave:Connect(function() pcall(function()
             tween(btn, {Size = UDim2.new(1,0,0,h)}, 0.2):Play()
-            tween(s, {Transparency = 0.5}, 0.2):Play()
         end) end)
         return btn, lbl
     end
@@ -1328,10 +1338,12 @@ local function startCarTool()
             BackgroundColor3 = COLOR.GreyDark, Text = "🚗 TP Obj", TextColor3 = COLOR.White,
             Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
         corner(tpObj, 6)
+        createGlossyBorder(tpObj, 1)
         local tpPlr = new("TextButton", {Size = UDim2.new(0.32,-3,0,26), Position = UDim2.new(0.32,3,0,28),
             BackgroundColor3 = COLOR.GreyDark, Text = "🧍 TP Player", TextColor3 = COLOR.White,
             Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
         corner(tpPlr, 6)
+        createGlossyBorder(tpPlr, 1)
         local delBtn = new("TextButton", {Size = UDim2.new(0.36,-12,0,26), Position = UDim2.new(0.64,9,0,28),
             BackgroundColor3 = COLOR.Error, Text = "🗑 Hapus", TextColor3 = COLOR.White,
             Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
@@ -1479,11 +1491,7 @@ local function startCarTool()
             LayoutOrder = index, ZIndex = 121, Parent = TruckSupportList,
         })
         corner(row, 8)
-        new("UIStroke", {
-            Thickness = 1,
-            Color = disabled and COLOR.GreyMed or COLOR.White,
-            Transparency = disabled and 0.5 or 0.5, Parent = row,
-        })
+        createGlossyBorder(row, 1)
 
         new("TextLabel", {
             Size = UDim2.new(0.15,0,1,0), Position = UDim2.new(0,8,0,0),
@@ -1596,10 +1604,8 @@ local function startCarTool()
             ZIndex = 121, Parent = TruckList,
         })
         corner(card, 10)
-        new("UIStroke", {Thickness = isFav and 2 or 1,
-            Color = isFav and Color3.fromRGB(255, 200, 60) or COLOR.White,
-            Transparency = 0.3, Parent = card})
-
+        createGlossyBorder(card, isFav and 2 or 1)
+        
         local img = new("ImageLabel", {
             Size = UDim2.new(1,-8,0,60), Position = UDim2.new(0,4,0,4),
             BackgroundColor3 = COLOR.Black, BackgroundTransparency = 0.3,
@@ -1837,6 +1843,7 @@ local function startCarTool()
         TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11,
         ZIndex = 130, Parent = DestStatusRow})
     corner(ScanDestBtn, 8)
+    createGlossyBorder(ScanDestBtn, 1)
 
     local DestList = new("ScrollingFrame", {Size = UDim2.new(1,0,0,140), BackgroundColor3 = COLOR.BG2,
         BackgroundTransparency = 0.4, BorderSizePixel = 0, ScrollBarThickness = 3,
@@ -1875,7 +1882,7 @@ local function startCarTool()
             BackgroundColor3 = COLOR.Black, Text = "🚗 TP Truck", TextColor3 = COLOR.White,
             Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
         corner(tpBtn, 6)
-        new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = tpBtn})
+        createGlossyBorder(tpBtn, 1)
 
         local setAutoBtn = new("TextButton", {Size = UDim2.new(0.52,-12,0,22), Position = UDim2.new(0.42,9,0,28),
             BackgroundColor3 = COLOR.White, Text = "🌾 Set Auto-Farm", TextColor3 = COLOR.Black,
@@ -1968,6 +1975,7 @@ local function startCarTool()
         TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11,
         ZIndex = 130, Parent = LoadStatusRow})
     corner(ScanLoadBtn, 8)
+    createGlossyBorder(ScanLoadBtn, 1)
 
     local LoadList = new("ScrollingFrame", {Size = UDim2.new(1,0,0,140), BackgroundColor3 = COLOR.BG2,
         BackgroundTransparency = 0.4, BorderSizePixel = 0, ScrollBarThickness = 3,
@@ -2007,7 +2015,7 @@ local function startCarTool()
             BackgroundColor3 = COLOR.Black, Text = "⚡ Far-Load", TextColor3 = COLOR.White,
             Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
         corner(farLoadBtn, 6)
-        new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = farLoadBtn})
+        createGlossyBorder(farLoadBtn, 1)
 
         local farLoadLoopBtn = new("TextButton", {Size = UDim2.new(0.48,-12,0,22), Position = UDim2.new(0.5,9,0,30),
             BackgroundColor3 = COLOR.White, Text = "🔁 Loop 5x", TextColor3 = COLOR.Black,
@@ -2049,4 +2057,183 @@ local function startCarTool()
         end
         local loads = scanLoadingPoints()
         if #loads == 0 then
-            LoadEmptyLabel
+            LoadEmptyLabel.Visible = true
+            LoadStatus.Text = "❌ 0 loading point"
+            LoadStatus.TextColor3 = COLOR.Error
+        else
+            LoadEmptyLabel.Visible = false
+            LoadStatus.Text = "✅ " .. #loads .. " loading point"
+            LoadStatus.TextColor3 = COLOR.Success
+            for i, l in ipairs(loads) do
+                pcall(buildLoadRow, l, i)
+            end
+        end
+        LoadList.CanvasSize = UDim2.new(0, 0, 0, #loads * 60 + 12)
+    end
+
+    task.spawn(function()
+        task.wait(2)
+        pcall(refreshLoadList)
+    end)
+
+    ScanLoadBtn.MouseButton1Click:Connect(function()
+        ScanLoadBtn.Text = "⏳ Scan..."
+        pcall(refreshLoadList)
+        ScanLoadBtn.Text = "✅ Selesai!"
+        task.wait(1.2); ScanLoadBtn.Text = "🔄 Scan Muatan"
+    end)
+
+    -- ═══ FLY SECTION ═══
+    new("Frame", {Size = UDim2.new(1,0,0,1), BackgroundColor3 = COLOR.White,
+        BackgroundTransparency = 0.8, BorderSizePixel = 0, LayoutOrder = 8, ZIndex = 120, Parent = Content})
+
+    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1,
+        Text = "✈️  FLY MODE", TextColor3 = COLOR.White,
+        Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left,
+        LayoutOrder = 9, ZIndex = 120, Parent = Content})
+    local FlyBtn, FlyLbl = makePremiumBtn(Content, "✈️  Fly: OFF", COLOR.GreyDark, COLOR.Black)
+    FlyBtn.LayoutOrder = 10
+
+    local FlySpeedRow = new("Frame", {Size = UDim2.new(1,0,0,38), BackgroundColor3 = COLOR.BG2,
+        BackgroundTransparency = 0.4, BorderSizePixel = 0, LayoutOrder = 11, ZIndex = 120, Parent = Content})
+    corner(FlySpeedRow, 8)
+    new("TextLabel", {Size = UDim2.new(0.42,0,1,0), Position = UDim2.new(0,10,0,0),
+        BackgroundTransparency = 1, Text = "✈️ Fly Speed:", TextColor3 = COLOR.White,
+        Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 130, Parent = FlySpeedRow})
+    local FlySpeedBox = new("TextBox", {Size = UDim2.new(0.52,0,1,-8), Position = UDim2.new(0.44,0,0,4),
+        BackgroundColor3 = COLOR.Black, PlaceholderText = "Default: 60", Text = tostring(flySpeed),
+        TextColor3 = COLOR.White, PlaceholderColor3 = COLOR.TextDim,
+        Font = Enum.Font.GothamBold, TextSize = 12, BorderSizePixel = 0, ZIndex = 130, Parent = FlySpeedRow})
+    corner(FlySpeedBox, 6)
+    new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = FlySpeedBox})
+
+    local StatusLabel = new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1,
+        Text = "Status: Siap digunakan", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham,
+        TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left,
+        LayoutOrder = 12, ZIndex = 120, Parent = Content})
+
+    -- ═══ OPEN/CLOSE ═══
+    local isAnimating = false
+    local function openGUI()
+        if MainWrapper.Visible or isAnimating then return end
+        isAnimating = true
+        MainWrapper.Visible = true
+        MainWrapper.Size = UDim2.new(0,0,0,0)
+        MainFrame.BackgroundTransparency = 1
+        pcall(function()
+            tween(MainWrapper, {Size = UDim2.new(0,guiW,0,guiH)}, 0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out):Play()
+            tween(MainFrame, {BackgroundTransparency = 0}, 0.3):Play()
+        end)
+        task.wait(0.4); isAnimating = false
+    end
+    local function closeGUI()
+        if not MainWrapper.Visible or isAnimating then return end
+        isAnimating = true
+        pcall(function()
+            tween(MainWrapper, {Size = UDim2.new(0,0,0,0)}, 0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
+            tween(MainFrame, {BackgroundTransparency = 1}, 0.2):Play()
+        end)
+        task.wait(0.3)
+        MainWrapper.Visible = false
+        MainWrapper.Size = UDim2.new(0,guiW,0,guiH)
+        MainFrame.BackgroundTransparency = 0
+        isAnimating = false
+    end
+    local function toggleGUI()
+        if MainWrapper.Visible then closeGUI() else openGUI() end
+    end
+
+    bind(ToggleBtn.MouseButton1Click, function()
+        if hasMoved then return end
+        toggleGUI()
+    end)
+    bind(CloseBtn.MouseButton1Click, closeGUI)
+
+    bind(SaveBtn.MouseButton1Click, function()
+        local char = LocalPlayer.Character
+        if not char then return end
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        slotCounter = slotCounter + 1
+        table.insert(savedPositions, {name = "Slot " .. slotCounter, pos = hrp.Position})
+        markSaveDirty(); refreshPositionList()
+        SaveLbl.Text = "✅  Tersimpan (Slot " .. slotCounter .. ")"
+        StatusLabel.Text = "Status: Disave ke Slot " .. slotCounter
+        task.wait(1.2); SaveLbl.Text = "💾  Save Posisi ke Slot Baru"
+    end)
+
+    bind(FindBtn.MouseButton1Click, function()
+        targetVehicleRoot = findNearestCar()
+        if targetVehicleRoot then
+            FindLbl.Text = "✅  " .. targetVehicleRoot.Name
+            StatusLabel.Text = "Status: Target ditemukan"
+        else
+            FindLbl.Text = "❌  Tidak ada target"
+            StatusLabel.Text = "Status: Tidak ada target"
+        end
+        task.wait(1.5); FindLbl.Text = "🔍  Cari Target Terdekat"
+    end)
+
+    bind(SwitchBtn.MouseButton1Click, function()
+        farmToggleActive = not farmToggleActive
+        setSwitchVisual(farmToggleActive)
+        if farmToggleActive then
+            startFarm(StatusLabel)
+        else
+            stopFarm()
+            StatusLabel.Text = "Status: Siap digunakan"
+            StatusLabel.TextColor3 = COLOR.TextDim
+        end
+    end)
+
+    bind(FlyBtn.MouseButton1Click, function()
+        toggleFly()
+        if flyEnabled then
+            FlyLbl.Text = "✈️  Fly: ON"; FlyBtn.BackgroundColor3 = COLOR.White; FlyLbl.TextColor3 = COLOR.Black
+            StatusLabel.Text = "Status: Fly aktif"
+        else
+            FlyLbl.Text = "✈️  Fly: OFF"; FlyBtn.BackgroundColor3 = COLOR.GreyDark; FlyLbl.TextColor3 = COLOR.White
+            StatusLabel.Text = "Status: Fly nonaktif"
+        end
+    end)
+
+    bind(FlySpeedBox.FocusLost, function()
+        local v = tonumber(FlySpeedBox.Text)
+        if v and v > 0 and v <= 500 then
+            flySpeed = v; markSaveDirty(); StatusLabel.Text = "Status: Fly speed → " .. v
+        else
+            FlySpeedBox.Text = tostring(flySpeed); StatusLabel.Text = "⚠️ Fly speed harus 1-500"
+        end
+    end)
+
+    bind(UserInputService.InputBegan, function(input, gp)
+        if gp then return end
+        if input.KeyCode == Enum.KeyCode.T then
+            if not targetVehicleRoot then targetVehicleRoot = findNearestCar() end
+            if #savedPositions > 0 then teleportCarToPos(savedPositions[#savedPositions].pos) end
+        elseif input.KeyCode == Enum.KeyCode.F then
+            toggleFly()
+            if flyEnabled then FlyLbl.Text = "✈️  Fly: ON"; FlyBtn.BackgroundColor3 = COLOR.White; FlyLbl.TextColor3 = COLOR.Black
+            else FlyLbl.Text = "✈️  Fly: OFF"; FlyBtn.BackgroundColor3 = COLOR.GreyDark; FlyLbl.TextColor3 = COLOR.White end
+        elseif input.KeyCode == Enum.KeyCode.RightControl then
+            toggleGUI()
+        end
+    end)
+
+    print("[BSTS-ID] ✅ v4.3 Mono Glossy Edition siap!")
+end
+
+-- ═══════════════════════════════════════════════════════════════
+-- ENTRY
+-- ═══════════════════════════════════════════════════════════════
+task.spawn(function()
+    if not isBSTSGame() then
+        print("[BSTS-ID] Map tidak sesuai: " .. game.Name)
+        buildWrongMapUI(); return
+    end
+    print("[BSTS-ID] Game terdeteksi. Loading v4.3...")
+    startCarTool()
+end)
+
+print("[BSTS-ID - LuxxyHub] v4.3 Mono Glossy Edition Loaded! ✨")
