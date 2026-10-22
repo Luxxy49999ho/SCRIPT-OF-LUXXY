@@ -1,7 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════
--- BSTS-ID - LuxxyHub v4.3 (Mono Glossy Edition)
--- BAGIAN 1 DARI 2
+-- BSTS-ID - LuxxyHub
+-- v4.3 (Mono Glossy Edition)
 -- ═══════════════════════════════════════════════════════════════
+
 local CONFIG = {
     BrandName = "BSTS-ID - LuxxyHub",
     ConfigFile = "bstsid_luxxyhub_config.json",
@@ -17,13 +18,25 @@ local CONFIG = {
     TruckSpawnerFolder = "TruckSpawnerRemotes",
     SpawnTruckRemote = "SpawnTruck",
     RemoveTruckRemote = "RemoveTrucks",
-    TrailerNames = {"semi trailer", "trailer lowboy", "trailer pencocokan", "trailer besi tua", "trailer hino"},
-    FarmTruckWhitelist = {"BESI TUA", "GIGA", "GIGA TRAILER", "HINO", "HINO TRAILER", "Trailer HINO", "FUSO", "FUSO THE GREAT", "FUSO KAYU", "FUSO LONG", "FUSO YANG HEBAT", "Fuso Panjang", "DYNA", "L300", "L300 HOREG", "RAGASA KUNING", "REDEKA", "REBEKA", "SEMI TRAILER", "TRAILER PENCOCOKAN", "TRAILER LOWBOY", "THE FUSO", "Canter Horeg", "Trailer Besi Tua"},
+    TrailerNames = {
+        "semi trailer", "trailer lowboy", "trailer pencocokan",
+        "trailer besi tua", "trailer hino",
+    },
+    FarmTruckWhitelist = {
+        "BESI TUA", "GIGA", "GIGA TRAILER",
+        "HINO", "HINO TRAILER", "Trailer HINO",
+        "FUSO", "FUSO THE GREAT", "FUSO KAYU", "FUSO LONG", "FUSO YANG HEBAT", "Fuso Panjang",
+        "DYNA", "L300", "L300 HOREG",
+        "RAGASA KUNING", "REDEKA", "REBEKA",
+        "SEMI TRAILER", "TRAILER PENCOCOKAN", "TRAILER LOWBOY",
+        "THE FUSO", "Canter Horeg", "Trailer Besi Tua",
+    },
     Timeout = 10,
 }
 
 local DEFAULT_SLOT19 = Vector3.new(-527, 95, 305)
 local DEFAULT_SLOT20 = Vector3.new(2482, 380, -607)
+
 local IMG_TOGGLE = "rbxassetid://125806010780793"
 local IMG_LOGO = "rbxassetid://72484610504506"
 
@@ -39,10 +52,8 @@ local COLOR = {
     Black = Color3.fromRGB(0, 0, 0),
     GreyDark = Color3.fromRGB(20, 20, 20),
     GreyMed = Color3.fromRGB(60, 60, 60),
-    GreyLight = Color3.fromRGB(150, 150, 150),
     BG = Color3.fromRGB(10, 10, 10),       
     BG2 = Color3.fromRGB(25, 25, 25),      
-    Text = Color3.fromRGB(240, 240, 240),  
     TextDim = Color3.fromRGB(150, 150, 150),
     Error = Color3.fromRGB(220, 60, 60),   
     Success = Color3.fromRGB(80, 200, 100),
@@ -287,7 +298,8 @@ local function startCarTool()
         userConfig.toggleOffsetY = nil
         markSaveDirty()
     end
-        local function findNearestCar()
+
+    local function findNearestCar()
         local char = LocalPlayer.Character
         if not char then return nil end
         local hrp = char:FindFirstChild("HumanoidRootPart")
@@ -1222,4 +1234,5 @@ task.spawn(function()
     print("[BSTS-ID] Game terdeteksi. Loading v4.3...")
     startCarTool()
 end)
+
 print("[BSTS-ID - LuxxyHub] v4.3 Mono Glossy Edition Loaded! ✨")
