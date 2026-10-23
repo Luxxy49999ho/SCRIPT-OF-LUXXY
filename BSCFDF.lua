@@ -1,6 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════
--- BSTS-ID - LuxxyHub
--- v4.3 (Mono Glossy Edition)
+-- BSTS-ID - LuxxyHub v4.3 (Mono Glossy Edition)
 -- ═══════════════════════════════════════════════════════════════
 
 local CONFIG = {
