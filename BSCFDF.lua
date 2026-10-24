@@ -1,6 +1,5 @@
--- ═══════════════════════════════════════════════════════════════
--- BSTS-ID - LuxxyHub v4.3
--- ═══════════════════════════════════════════════════════════════
+-- BSTS-ID - LuxxyHub v4.3 (Mono Glossy Edition)
+
 local CONFIG = {
     BrandName = "BSTS-ID - LuxxyHub",
     ConfigFile = "bstsid_luxxyhub_config.json",
@@ -545,7 +544,7 @@ local function startCarTool()
         local tpPos = target.position + offsetDir * CONFIG.FarLoadOffset
         tpPos = Vector3.new(tpPos.X, target.position.Y + 3, tpPos.Z)
 
-        if statusLbl then statusLbl.Text = "⚡ Far-Load: " .. target.name; statusLbl.TextColor3 = COLOR.White end
+        if statusLbl then statusLbl.Text = "[FarLoad] " .. target.name; statusLbl.TextColor3 = COLOR.White end
 
         local allParts = {}
         for _, p in pairs(vehicle:GetDescendants()) do if p:IsA("BasePart") then table.insert(allParts, p) end end
@@ -569,7 +568,7 @@ local function startCarTool()
 
         for _, p in pairs(allParts) do pcall(function() if p:CanSetNetworkOwnership() then p:SetNetworkOwner(LocalPlayer) end end) end
         for _, p in pairs(allParts) do p.Anchored = false end
-        if statusLbl then statusLbl.Text = "✅ Far-Load OK: " .. target.name; statusLbl.TextColor3 = COLOR.Success end
+        if statusLbl then statusLbl.Text = "[FarLoad OK] " .. target.name; statusLbl.TextColor3 = COLOR.Success end
         return true
     end
 
@@ -609,7 +608,7 @@ local function startCarTool()
         local remote = folder:FindFirstChild(CONFIG.SpawnTruckRemote)
         if not remote then return false end
         local ok = pcall(function() remote:FireServer(name) end)
-        if ok then print("[BSTS-ID] 🚀 Spawn: " .. name); return true end
+        if ok then print("[BSTS-ID] Spawn: " .. name); return true end
         return false
     end
 
@@ -620,16 +619,16 @@ local function startCarTool()
         local remote = folder:FindFirstChild(CONFIG.RemoveTruckRemote)
         if not remote then return false end
         local ok = pcall(function() remote:FireServer() end)
-        if ok then print("[BSTS-ID] 🗑 Semua truck dihapus"); return true end
+        if ok then print("[BSTS-ID] Semua truck dihapus"); return true end
         return false
     end
 
     local function autoSpawnAndSit(truckName, statusLbl)
         if not truckName then return false end
-        if statusLbl then statusLbl.Text = "🗑 Menghapus truck..."; statusLbl.TextColor3 = COLOR.White end
+        if statusLbl then statusLbl.Text = "[Hapus] Menghapus truck..."; statusLbl.TextColor3 = COLOR.White end
         removeAllTrucks()
         task.wait(1.5)
-        if statusLbl then statusLbl.Text = "🚀 Spawn " .. truckName .. "..."; statusLbl.TextColor3 = COLOR.White end
+        if statusLbl then statusLbl.Text = "[Spawn] " .. truckName .. "..."; statusLbl.TextColor3 = COLOR.White end
         spawnTruckByName(truckName)
         task.wait(3)
         
@@ -648,7 +647,7 @@ local function startCarTool()
         end
 
         if nearestSeat then
-            if statusLbl then statusLbl.Text = "🧍 Duduk..."; statusLbl.TextColor3 = COLOR.White end
+            if statusLbl then statusLbl.Text = "[Duduk] Duduk..."; statusLbl.TextColor3 = COLOR.White end
             hrp.CFrame = nearestSeat.CFrame * CFrame.new(0, 3, 0)
             task.wait(0.5)
             hum.Sit = true
@@ -733,20 +732,20 @@ local function startCarTool()
                         for _, t in ipairs(CONFIG.FarmTruckWhitelist) do if not isTruckDisabled(t) then targetTruck = t; break end end
                     end
                     if not targetTruck then
-                        if statusLbl then statusLbl.Text = "❌ Semua truck dimatikan"; statusLbl.TextColor3 = COLOR.Error end
+                        if statusLbl then statusLbl.Text = "[X] Semua truck dimatikan"; statusLbl.TextColor3 = COLOR.Error end
                         task.wait(3)
                     else
                         local success = autoSpawnAndSit(targetTruck, statusLbl)
                         if not success then
-                            if statusLbl then statusLbl.Text = "❌ Gagal spawn. Pastikan di jalan."; statusLbl.TextColor3 = COLOR.Error end
+                            if statusLbl then statusLbl.Text = "[X] Gagal spawn. Pastikan di jalan."; statusLbl.TextColor3 = COLOR.Error end
                             task.wait(3)
                         else task.wait(1) end
                     end
                 else
                     local pos19, pos20 = getSlot19Pos(), getSlot20Pos()
-                    if statusLbl then statusLbl.Text = "🌾 [1/6] TP Slot 19..."; statusLbl.TextColor3 = COLOR.White end
+                    if statusLbl then statusLbl.Text = "[1/6] TP Slot 19..."; statusLbl.TextColor3 = COLOR.White end
                     teleportCarToPos(pos19); task.wait(2)
-                    if statusLbl then statusLbl.Text = "🌾 [2/6] Muat Slot 19..." end
+                    if statusLbl then statusLbl.Text = "[2/6] Muat Slot 19..." end
                     if fireproximityprompt then
                         local p = workspace:FindFirstChild("SEMUA MUATAN") and workspace.SEMUA MUATAN:GetDescendants() or {}
                         for _, o in pairs(p) do if o:IsA("ProximityPrompt") and o.Enabled then pcall(function() fireproximityprompt(o) end); break end end
@@ -754,9 +753,9 @@ local function startCarTool()
                     task.wait(2.5)
                     if not farmEnabled then break end
 
-                    if statusLbl then statusLbl.Text = "🌾 [3/6] TP Slot 20..." end
+                    if statusLbl then statusLbl.Text = "[3/6] TP Slot 20..." end
                     teleportCarToPos(pos20); task.wait(2)
-                    if statusLbl then statusLbl.Text = "🌾 [4/6] Muat Slot 20..." end
+                    if statusLbl then statusLbl.Text = "[4/6] Muat Slot 20..." end
                     if fireproximityprompt then
                         local p = workspace:FindFirstChild("SEMUA MUATAN") and workspace.SEMUA MUATAN:GetDescendants() or {}
                         for _, o in pairs(p) do if o:IsA("ProximityPrompt") and o.Enabled then pcall(function() fireproximityprompt(o) end); break end end
@@ -766,12 +765,12 @@ local function startCarTool()
 
                     local destName = userConfig.autoFarmDestination
                     if destName then
-                        if statusLbl then statusLbl.Text = "💰 [5/6] TP Destinasi..."; statusLbl.TextColor3 = COLOR.Success end
+                        if statusLbl then statusLbl.Text = "[5/6] TP Destinasi..."; statusLbl.TextColor3 = COLOR.Success end
                         teleportToDestination(destName); task.wait(3)
-                        if statusLbl then statusLbl.Text = "💰 [6/6] Tunggu bayaran..." end
+                        if statusLbl then statusLbl.Text = "[6/6] Tunggu bayaran..." end
                         task.wait(2)
                     else
-                        if statusLbl then statusLbl.Text = "⚠️ Set destinasi dulu di panel 🎯"; statusLbl.TextColor3 = COLOR.Error end
+                        if statusLbl then statusLbl.Text = "[!] Set destinasi dulu di panel"; statusLbl.TextColor3 = COLOR.Error end
                         task.wait(2)
                     end
                 end
@@ -838,7 +837,7 @@ local function startCarTool()
     new("ImageLabel", {Size = UDim2.new(0, 32, 0, 32), Position = UDim2.new(0, 12, 0.5, -16), BackgroundTransparency = 1, Image = IMG_LOGO, ImageColor3 = Color3.fromRGB(255, 255, 255), ScaleType = Enum.ScaleType.Fit, ZIndex = 5, Parent = Header})
     new("TextLabel", {Size = UDim2.new(1,-90,1,-5), Position = UDim2.new(0,50,0,0), BackgroundTransparency = 1, Text = "BSTS-ID - LuxxyHub", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 15, TextXAlignment = Enum.TextXAlignment.Left, Parent = Header})
     new("TextLabel", {Size = UDim2.new(1,-90,0,12), Position = UDim2.new(0,50,1,-15), BackgroundTransparency = 1, Text = "Mono Glossy v4.3", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Left, Parent = Header})
-    local CloseBtn = new("TextButton", {Size = UDim2.new(0,26,0,26), Position = UDim2.new(1,-34,0,12), BackgroundColor3 = COLOR.GreyDark, Text = "✕", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 13, BorderSizePixel = 0, ZIndex = 150, Parent = Header})
+    local CloseBtn = new("TextButton", {Size = UDim2.new(0,26,0,26), Position = UDim2.new(1,-34,0,12), BackgroundColor3 = COLOR.GreyDark, Text = "X", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 13, BorderSizePixel = 0, ZIndex = 150, Parent = Header})
     corner(CloseBtn, 13); new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = CloseBtn})
 
     local Content = new("ScrollingFrame", {Size = UDim2.new(1,-16,1,-60), Position = UDim2.new(0,8,0,55), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 2, ScrollBarImageColor3 = COLOR.White, CanvasSize = UDim2.new(0,0,0,0), AutomaticCanvasSize = Enum.AutomaticSize.Y, ZIndex = 110, Parent = MainFrame})
@@ -854,10 +853,10 @@ local function startCarTool()
         return btn, lbl
     end
 
-    local SaveBtn, SaveLbl = makePremiumBtn(Content, "💾  Save Posisi ke Slot Baru", COLOR.GreyDark, COLOR.Black); SaveBtn.LayoutOrder = 1
-    local FindBtn, FindLbl = makePremiumBtn(Content, "🔍  Cari Target Terdekat", COLOR.GreyDark, COLOR.Black); FindBtn.LayoutOrder = 2
+    local SaveBtn, SaveLbl = makePremiumBtn(Content, "[Save] Posisi ke Slot Baru", COLOR.GreyDark, COLOR.Black); SaveBtn.LayoutOrder = 1
+    local FindBtn, FindLbl = makePremiumBtn(Content, "[Cari] Target Terdekat", COLOR.GreyDark, COLOR.Black); FindBtn.LayoutOrder = 2
 
-    local PosTitle = new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "💾  POSISI TERSIMPAN (0)", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 3, ZIndex = 120, Parent = Content})
+    local PosTitle = new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "[Posisi] TERSIMPAN (0)", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 3, ZIndex = 120, Parent = Content})
     local PositionsList = new("ScrollingFrame", {Size = UDim2.new(1,0,0,150), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.4, BorderSizePixel = 0, ScrollBarThickness = 3, ScrollBarImageColor3 = COLOR.White, CanvasSize = UDim2.new(0,0,0,0), LayoutOrder = 4, ZIndex = 120, Parent = Content})
     corner(PositionsList, 10)
     new("UIListLayout", {SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0,6), HorizontalAlignment = Enum.HorizontalAlignment.Center, Parent = PositionsList})
@@ -872,15 +871,15 @@ local function startCarTool()
         if type(posData) ~= "table" or typeof(posData.pos) ~= "Vector3" then return end
         local row = new("Frame", {Size = UDim2.new(1,0,0,ROW_HEIGHT), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.2, BorderSizePixel = 0, LayoutOrder = index, ZIndex = 121, Parent = PositionsList})
         corner(row, 8); new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = row})
-        new("TextLabel", {Size = UDim2.new(1,-16,0,20), Position = UDim2.new(0,8,0,4), BackgroundTransparency = 1, Text = string.format("%s  •  X:%d Y:%d Z:%d", posData.name or "Slot", math.floor(posData.pos.X), math.floor(posData.pos.Y), math.floor(posData.pos.Z)), TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 122, Parent = row})
-        local tpObj = new("TextButton", {Size = UDim2.new(0.32,-3,0,26), Position = UDim2.new(0,6,0,28), BackgroundColor3 = COLOR.GreyDark, Text = "🚗 TP Obj", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
+        new("TextLabel", {Size = UDim2.new(1,-16,0,20), Position = UDim2.new(0,8,0,4), BackgroundTransparency = 1, Text = string.format("%s X:%d Y:%d Z:%d", posData.name or "Slot", math.floor(posData.pos.X), math.floor(posData.pos.Y), math.floor(posData.pos.Z)), TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 122, Parent = row})
+        local tpObj = new("TextButton", {Size = UDim2.new(0.32,-3,0,26), Position = UDim2.new(0,6,0,28), BackgroundColor3 = COLOR.GreyDark, Text = "TP Obj", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
         corner(tpObj, 6); createGlossyBorder(tpObj, 1)
-        local tpPlr = new("TextButton", {Size = UDim2.new(0.32,-3,0,26), Position = UDim2.new(0.32,3,0,28), BackgroundColor3 = COLOR.GreyDark, Text = "🧍 TP Player", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
+        local tpPlr = new("TextButton", {Size = UDim2.new(0.32,-3,0,26), Position = UDim2.new(0.32,3,0,28), BackgroundColor3 = COLOR.GreyDark, Text = "TP Player", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
         corner(tpPlr, 6); createGlossyBorder(tpPlr, 1)
-        local delBtn = new("TextButton", {Size = UDim2.new(0.36,-12,0,26), Position = UDim2.new(0.64,9,0,28), BackgroundColor3 = COLOR.Error, Text = "🗑 Hapus", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
+        local delBtn = new("TextButton", {Size = UDim2.new(0.36,-12,0,26), Position = UDim2.new(0.64,9,0,28), BackgroundColor3 = COLOR.Error, Text = "Hapus", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
         corner(delBtn, 6)
-        tpObj.MouseButton1Click:Connect(function() tpObj.Text = "⏳..."; teleportCarToPos(posData.pos); task.wait(0.4); tpObj.Text = "✅ OK!"; task.wait(0.8); tpObj.Text = "🚗 TP Obj" end)
-        tpPlr.MouseButton1Click:Connect(function() tpPlr.Text = "⏳..."; teleportPlayerToPos(posData.pos); task.wait(0.4); tpPlr.Text = "✅ OK!"; task.wait(0.8); tpPlr.Text = "🧍 TP Player" end)
+        tpObj.MouseButton1Click:Connect(function() tpObj.Text = "..."; teleportCarToPos(posData.pos); task.wait(0.4); tpObj.Text = "OK!"; task.wait(0.8); tpObj.Text = "TP Obj" end)
+        tpPlr.MouseButton1Click:Connect(function() tpPlr.Text = "..."; teleportPlayerToPos(posData.pos); task.wait(0.4); tpPlr.Text = "OK!"; task.wait(0.8); tpPlr.Text = "TP Player" end)
         delBtn.MouseButton1Click:Connect(function()
             for i, p in ipairs(savedPositions) do if p == posData then table.remove(savedPositions, i) break end end
             markSaveDirty(); refreshPositionList()
@@ -893,7 +892,7 @@ local function startCarTool()
             if type(pd) ~= "table" or typeof(pd.pos) ~= "Vector3" or type(pd.name) ~= "string" then table.remove(savedPositions, i); markSaveDirty() end
         end
         for _, c in pairs(PositionsList:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
-        PosTitle.Text = "💾  POSISI TERSIMPAN (" .. #savedPositions .. ")"
+        PosTitle.Text = "[Posisi] TERSIMPAN (" .. #savedPositions .. ")"
         if #savedPositions == 0 then EmptyLabel.Visible = true else EmptyLabel.Visible = false; for i, pd in ipairs(savedPositions) do pcall(buildSlotRow, pd, i) end end
         PositionsList.CanvasSize = UDim2.new(0, 0, 0, #savedPositions == 0 and 72 or (#savedPositions * (ROW_HEIGHT + ROW_PADDING) + 12))
     end
@@ -901,7 +900,7 @@ local function startCarTool()
 
     new("Frame", {Size = UDim2.new(1,0,0,1), BackgroundColor3 = COLOR.White, BackgroundTransparency = 0.8, BorderSizePixel = 0, LayoutOrder = 5, ZIndex = 120, Parent = Content})
 
-    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "🌾  AUTO FARM (FULL AUTO)", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 6, ZIndex = 120, Parent = Content})
+    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "[AUTO FARM]", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 6, ZIndex = 120, Parent = Content})
     local FarmToggleRow = new("Frame", {Size = UDim2.new(1,0,0,50), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.3, BorderSizePixel = 0, LayoutOrder = 7, ZIndex = 120, Parent = Content})
     corner(FarmToggleRow, 10); new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = FarmToggleRow})
     local FarmLabel = new("TextLabel", {Size = UDim2.new(0.55,0,1,0), Position = UDim2.new(0,12,0,0), BackgroundTransparency = 1, Text = "AUTO FARM: OFF", TextColor3 = COLOR.Error, Font = Enum.Font.GothamBold, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 130, Parent = FarmToggleRow})
@@ -923,8 +922,8 @@ local function startCarTool()
     end
 
     new("Frame", {Size = UDim2.new(1,0,0,1), BackgroundColor3 = COLOR.White, BackgroundTransparency = 0.8, BorderSizePixel = 0, LayoutOrder = 7.1, ZIndex = 120, Parent = Content})
-    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "🚛  TRUCK SUPPORT", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 7.11, ZIndex = 120, Parent = Content})
-    local TruckSupportInfo = new("TextLabel", {Size = UDim2.new(1,0,0,18), BackgroundTransparency = 1, Text = "✅ Semua truck aktif", TextColor3 = COLOR.Success, Font = Enum.Font.Gotham, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 7.12, ZIndex = 120, Parent = Content})
+    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "[TRUCK SUPPORT]", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 7.11, ZIndex = 120, Parent = Content})
+    local TruckSupportInfo = new("TextLabel", {Size = UDim2.new(1,0,0,18), BackgroundTransparency = 1, Text = "Semua truck aktif", TextColor3 = COLOR.Success, Font = Enum.Font.Gotham, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 7.12, ZIndex = 120, Parent = Content})
     local TruckSupportList = new("ScrollingFrame", {Size = UDim2.new(1,0,0,120), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.4, BorderSizePixel = 0, ScrollBarThickness = 3, ScrollBarImageColor3 = COLOR.White, CanvasSize = UDim2.new(0,0,0,0), LayoutOrder = 7.13, ZIndex = 120, Parent = Content})
     corner(TruckSupportList, 10)
     new("UIListLayout", {SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0,4), HorizontalAlignment = Enum.HorizontalAlignment.Center, Parent = TruckSupportList})
@@ -952,7 +951,7 @@ local function startCarTool()
         local disabled = isTruckDisabled(truckName)
         local row = new("TextButton", {Size = UDim2.new(1,0,0,30), BackgroundColor3 = disabled and COLOR.Black or COLOR.GreyDark, BackgroundTransparency = disabled and 0.5 or 0, BorderSizePixel = 0, Text = "", AutoButtonColor = false, LayoutOrder = index, ZIndex = 121, Parent = TruckSupportList})
         corner(row, 8); createGlossyBorder(row, 1)
-        new("TextLabel", {Size = UDim2.new(0.15,0,1,0), Position = UDim2.new(0,8,0,0), BackgroundTransparency = 1, Text = disabled and "❌" or "✅", TextColor3 = disabled and COLOR.Error or COLOR.Success, Font = Enum.Font.GothamBold, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 122, Parent = row})
+        new("TextLabel", {Size = UDim2.new(0.15,0,1,0), Position = UDim2.new(0,8,0,0), BackgroundTransparency = 1, Text = disabled and "[X]" or "[OK]", TextColor3 = disabled and COLOR.Error or COLOR.Success, Font = Enum.Font.GothamBold, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 122, Parent = row})
         new("TextLabel", {Size = UDim2.new(0.85,-16,1,0), Position = UDim2.new(0.15,0,0,0), BackgroundTransparency = 1, Text = truckName, TextColor3 = disabled and COLOR.TextDim or COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 122, Parent = row})
         row.MouseButton1Click:Connect(function()
             toggleTruckDisabled(truckName)
@@ -964,7 +963,7 @@ local function startCarTool()
                 TruckSupportList.CanvasSize = UDim2.new(0, 0, 0, #trucks * 34 + 12)
                 local activeCount = 0
                 for _, t in ipairs(trucks) do if not isTruckDisabled(t) then activeCount = activeCount + 1 end end
-                TruckSupportInfo.Text = "✅ " .. activeCount .. "/" .. #trucks .. " truck aktif"
+                TruckSupportInfo.Text = "" .. activeCount .. "/" .. #trucks .. " truck aktif"
                 TruckSupportInfo.TextColor3 = activeCount > 0 and COLOR.Success or COLOR.Error
             end)
         end)
@@ -977,15 +976,15 @@ local function startCarTool()
         TruckSupportList.CanvasSize = UDim2.new(0, 0, 0, #trucks * 34 + 12)
         local activeCount = 0
         for _, t in ipairs(trucks) do if not isTruckDisabled(t) then activeCount = activeCount + 1 end end
-        TruckSupportInfo.Text = "✅ " .. activeCount .. "/" .. #trucks .. " truck aktif"
+        TruckSupportInfo.Text = "" .. activeCount .. "/" .. #trucks .. " truck aktif"
     end)
 
     new("Frame", {Size = UDim2.new(1,0,0,1), BackgroundColor3 = COLOR.White, BackgroundTransparency = 0.8, BorderSizePixel = 0, LayoutOrder = 7.4, ZIndex = 120, Parent = Content})
-    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "🚛  SPAWN TRUCK", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 7.41, ZIndex = 120, Parent = Content})
+    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "[SPAWN TRUCK]", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 7.41, ZIndex = 120, Parent = Content})
     local TruckTabBar = new("Frame", {Size = UDim2.new(1,0,0,34), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.3, BorderSizePixel = 0, LayoutOrder = 7.42, ZIndex = 120, Parent = Content})
     corner(TruckTabBar, 10); new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = TruckTabBar})
     new("UIListLayout", {FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Center, VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0,4), Parent = TruckTabBar})
-    local TruckStatus = new("TextLabel", {Size = UDim2.new(1,0,0,18), BackgroundTransparency = 1, Text = "⏳ Loading...", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 7.43, ZIndex = 120, Parent = Content})
+    local TruckStatus = new("TextLabel", {Size = UDim2.new(1,0,0,18), BackgroundTransparency = 1, Text = "Loading...", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 7.43, ZIndex = 120, Parent = Content})
     local TruckList = new("ScrollingFrame", {Size = UDim2.new(1,0,0,280), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.4, BorderSizePixel = 0, ScrollBarThickness = 3, ScrollBarImageColor3 = COLOR.White, CanvasSize = UDim2.new(0,0,0,0), LayoutOrder = 7.44, ZIndex = 120, Parent = Content})
     corner(TruckList, 10)
     new("UIPadding", {PaddingTop = UDim.new(0,6), PaddingBottom = UDim.new(0,6), PaddingLeft = UDim.new(0,6), PaddingRight = UDim.new(0,6), Parent = TruckList})
@@ -1004,16 +1003,16 @@ local function startCarTool()
         corner(img, 6)
         local nameBadge = new("TextLabel", {Size = UDim2.new(1,-8,0,16), Position = UDim2.new(0,4,0,66), BackgroundColor3 = COLOR.Black, BackgroundTransparency = 0.2, BorderSizePixel = 0, Text = truck.name, TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 9, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 123, Parent = card})
         corner(nameBadge, 5)
-        new("TextLabel", {Size = UDim2.new(1,-8,0,12), Position = UDim2.new(0,4,0,84), BackgroundTransparency = 1, Text = "💰 " .. formatPrice(truck.price) .. (truck.passId and " 🔒" or ""), TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 123, Parent = card})
+        new("TextLabel", {Size = UDim2.new(1,-8,0,12), Position = UDim2.new(0,4,0,84), BackgroundTransparency = 1, Text = formatPrice(truck.price) .. (truck.passId and " [LOCK]" or ""), TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 123, Parent = card})
 
-        local spawnBtn = new("TextButton", {Size = UDim2.new(0.55,-3,0,18), Position = UDim2.new(0,4,1,-22), BackgroundColor3 = COLOR.White, BorderSizePixel = 0, Text = "🚀 Spawn", TextColor3 = COLOR.Black, Font = Enum.Font.GothamBold, TextSize = 9, AutoButtonColor = false, ZIndex = 123, Parent = card})
+        local spawnBtn = new("TextButton", {Size = UDim2.new(0.55,-3,0,18), Position = UDim2.new(0,4,1,-22), BackgroundColor3 = COLOR.White, BorderSizePixel = 0, Text = "Spawn", TextColor3 = COLOR.Black, Font = Enum.Font.GothamBold, TextSize = 9, AutoButtonColor = false, ZIndex = 123, Parent = card})
         corner(spawnBtn, 5)
-        local farmBtn = new("TextButton", {Size = UDim2.new(0.4,-8,0,18), Position = UDim2.new(0.6,4,1,-22), BackgroundColor3 = COLOR.Success, BorderSizePixel = 0, Text = "🌾 Farm", TextColor3 = COLOR.Black, Font = Enum.Font.GothamBold, TextSize = 9, AutoButtonColor = false, ZIndex = 123, Parent = card})
+        local farmBtn = new("TextButton", {Size = UDim2.new(0.4,-8,0,18), Position = UDim2.new(0.6,4,1,-22), BackgroundColor3 = COLOR.Success, BorderSizePixel = 0, Text = "Farm", TextColor3 = COLOR.Black, Font = Enum.Font.GothamBold, TextSize = 9, AutoButtonColor = false, ZIndex = 123, Parent = card})
         corner(farmBtn, 5)
-        local favBtn = new("TextButton", {Size = UDim2.new(0,22,0,22), Position = UDim2.new(1,-24,0,2), BackgroundColor3 = isFav and Color3.fromRGB(255, 180, 50) or Color3.fromRGB(0,0,0), BackgroundTransparency = isFav and 0 or 0.4, BorderSizePixel = 0, Text = isFav and "⭐" or "☆", TextColor3 = isFav and COLOR.Black or COLOR.White, Font = Enum.Font.GothamBold, TextSize = 14, AutoButtonColor = false, ZIndex = 124, Parent = card})
+        local favBtn = new("TextButton", {Size = UDim2.new(0,22,0,22), Position = UDim2.new(1,-24,0,2), BackgroundColor3 = isFav and Color3.fromRGB(255, 180, 50) or Color3.fromRGB(0,0,0), BackgroundTransparency = isFav and 0 or 0.4, BorderSizePixel = 0, Text = isFav and "*" or "-", TextColor3 = isFav and COLOR.Black or COLOR.White, Font = Enum.Font.GothamBold, TextSize = 14, AutoButtonColor = false, ZIndex = 124, Parent = card})
         corner(favBtn, 11)
 
-        spawnBtn.MouseButton1Click:Connect(function() spawnBtn.Text = "⏳"; spawnTruckByName(truck.name); task.wait(0.5); spawnBtn.Text = "✅ OK"; task.wait(0.8); spawnBtn.Text = "🚀 Spawn" end)
+        spawnBtn.MouseButton1Click:Connect(function() spawnBtn.Text = "..."; spawnTruckByName(truck.name); task.wait(0.5); spawnBtn.Text = "OK"; task.wait(0.8); spawnBtn.Text = "Spawn" end)
         farmBtn.MouseButton1Click:Connect(function() userConfig.autoFarmTruck = truck.name; markSaveDirty(); farmToggleActive = true; setSwitchVisual(true); stopFarm(); startFarm(StatusLabel); StatusLabel.Text = "Status: Auto-Farm Full " .. truck.name; StatusLabel.TextColor3 = COLOR.Success end)
         favBtn.MouseButton1Click:Connect(function()
             userConfig.favoriteTrucks = userConfig.favoriteTrucks or {}
@@ -1045,7 +1044,7 @@ local function startCarTool()
             return a.price > b.price
         end)
 
-        TruckStatus.Text = string.format("✅ %s: %d truck", currentTab, #filtered)
+        TruckStatus.Text = string.format("%s: %d truck", currentTab, #filtered)
         for _, t in ipairs(filtered) do pcall(buildTruckCard, t) end
         TruckList.CanvasSize = UDim2.new(0, 0, 0, math.max(math.ceil(#filtered / 3) * 124 + 12, 280))
     end
@@ -1063,20 +1062,20 @@ local function startCarTool()
         end)
     end
 
-    makeTabBtn("🚛 Truk", "Truk")
-    makeTabBtn("🚛 Trailer", "Trailer")
+    makeTabBtn("Truk", "Truk")
+    makeTabBtn("Trailer", "Trailer")
 
-    local removeBtn = new("TextButton", {Size = UDim2.new(0, 100, 0, 26), BackgroundColor3 = COLOR.Error, BorderSizePixel = 0, Text = "🗑 Hapus Semua", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 9, AutoButtonColor = false, ZIndex = 130, Parent = TruckTabBar})
+    local removeBtn = new("TextButton", {Size = UDim2.new(0, 100, 0, 26), BackgroundColor3 = COLOR.Error, BorderSizePixel = 0, Text = "Hapus Semua", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 9, AutoButtonColor = false, ZIndex = 130, Parent = TruckTabBar})
     corner(removeBtn, 8)
-    removeBtn.MouseButton1Click:Connect(function() removeBtn.Text = "⏳..."; removeAllTrucks(); task.wait(0.6); removeBtn.Text = "✅ Done"; task.wait(0.8); removeBtn.Text = "🗑 Hapus Semua" end)
+    removeBtn.MouseButton1Click:Connect(function() removeBtn.Text = "..."; removeAllTrucks(); task.wait(0.6); removeBtn.Text = "OK"; task.wait(0.8); removeBtn.Text = "Hapus Semua" end)
     task.spawn(function() task.wait(0.5); pcall(refreshTruckList) end)
 
     new("Frame", {Size = UDim2.new(1,0,0,1), BackgroundColor3 = COLOR.White, BackgroundTransparency = 0.8, BorderSizePixel = 0, LayoutOrder = 7.5, ZIndex = 120, Parent = Content})
-    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "🎯  DESTINASI POINT", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 7.51, ZIndex = 120, Parent = Content})
+    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "[DESTINASI POINT]", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 7.51, ZIndex = 120, Parent = Content})
     local DestStatusRow = new("Frame", {Size = UDim2.new(1,0,0,42), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.3, BorderSizePixel = 0, LayoutOrder = 7.52, ZIndex = 120, Parent = Content})
     corner(DestStatusRow, 10); new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = DestStatusRow})
-    local DestStatus = new("TextLabel", {Size = UDim2.new(0.55,0,1,0), Position = UDim2.new(0,10,0,0), BackgroundTransparency = 1, Text = "⏳ Belum scan", TextColor3 = COLOR.TextDim, Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 130, Parent = DestStatusRow})
-    local ScanDestBtn = new("TextButton", {Size = UDim2.new(0.38,0,1,-10), Position = UDim2.new(0.6,0,0,5), BackgroundColor3 = COLOR.GreyDark, BorderSizePixel = 0, Text = "🔄 Scan Ulang", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11, ZIndex = 130, Parent = DestStatusRow})
+    local DestStatus = new("TextLabel", {Size = UDim2.new(0.55,0,1,0), Position = UDim2.new(0,10,0,0), BackgroundTransparency = 1, Text = "Belum scan", TextColor3 = COLOR.TextDim, Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 130, Parent = DestStatusRow})
+    local ScanDestBtn = new("TextButton", {Size = UDim2.new(0.38,0,1,-10), Position = UDim2.new(0.6,0,0,5), BackgroundColor3 = COLOR.GreyDark, BorderSizePixel = 0, Text = "Scan Ulang", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11, ZIndex = 130, Parent = DestStatusRow})
     corner(ScanDestBtn, 8)
     local DestList = new("ScrollingFrame", {Size = UDim2.new(1,0,0,140), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.4, BorderSizePixel = 0, ScrollBarThickness = 3, ScrollBarImageColor3 = COLOR.White, CanvasSize = UDim2.new(0,0,0,0), LayoutOrder = 7.53, ZIndex = 120, Parent = Content})
     corner(DestList, 10)
@@ -1087,14 +1086,14 @@ local function startCarTool()
     local function buildDestRow(dest, index)
         local row = new("Frame", {Size = UDim2.new(1,0,0,52), BackgroundColor3 = COLOR.GreyDark, BackgroundTransparency = 0.2, BorderSizePixel = 0, LayoutOrder = index, ZIndex = 121, Parent = DestList})
         corner(row, 8); new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = row})
-        new("TextLabel", {Size = UDim2.new(1,-16,0,20), Position = UDim2.new(0,8,0,4), BackgroundTransparency = 1, Text = "🎯 " .. dest.name, TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 122, Parent = row})
+        new("TextLabel", {Size = UDim2.new(1,-16,0,20), Position = UDim2.new(0,8,0,4), BackgroundTransparency = 1, Text = dest.name, TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 122, Parent = row})
         new("TextLabel", {Size = UDim2.new(1,-16,0,12), Position = UDim2.new(0,8,0,22), BackgroundTransparency = 1, Text = string.format("X:%d Y:%d Z:%d", math.floor(dest.position.X), math.floor(dest.position.Y), math.floor(dest.position.Z)), TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 122, Parent = row})
-        local tpBtn = new("TextButton", {Size = UDim2.new(0.42,-3,0,22), Position = UDim2.new(0,6,0,28), BackgroundColor3 = COLOR.Black, Text = "🚗 TP Truck", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
+        local tpBtn = new("TextButton", {Size = UDim2.new(0.42,-3,0,22), Position = UDim2.new(0,6,0,28), BackgroundColor3 = COLOR.Black, Text = "TP Truck", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
         corner(tpBtn, 6); new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = tpBtn})
-        local setAutoBtn = new("TextButton", {Size = UDim2.new(0.52,-12,0,22), Position = UDim2.new(0.42,9,0,28), BackgroundColor3 = COLOR.White, Text = "🌾 Set Auto-Farm", TextColor3 = COLOR.Black, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
+        local setAutoBtn = new("TextButton", {Size = UDim2.new(0.52,-12,0,22), Position = UDim2.new(0.42,9,0,28), BackgroundColor3 = COLOR.White, Text = "Set Auto-Farm", TextColor3 = COLOR.Black, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
         corner(setAutoBtn, 6)
-        tpBtn.MouseButton1Click:Connect(function() tpBtn.Text = "⏳..."; teleportToDestination(dest.fullName or dest.name); task.wait(0.4); tpBtn.Text = "✅ OK!"; task.wait(0.8); tpBtn.Text = "🚗 TP Truck" end)
-        setAutoBtn.MouseButton1Click:Connect(function() userConfig.autoFarmDestination = dest.fullName or dest.name; markSaveDirty(); StatusLabel.Text = "Status: Auto-farm → " .. dest.name; StatusLabel.TextColor3 = COLOR.Success; setAutoBtn.Text = "✅ Tersimpan"; task.wait(1.2); setAutoBtn.Text = "🌾 Set Auto-Farm" end)
+        tpBtn.MouseButton1Click:Connect(function() tpBtn.Text = "..."; teleportToDestination(dest.fullName or dest.name); task.wait(0.4); tpBtn.Text = "OK!"; task.wait(0.8); tpBtn.Text = "TP Truck" end)
+        setAutoBtn.MouseButton1Click:Connect(function() userConfig.autoFarmDestination = dest.fullName or dest.name; markSaveDirty(); StatusLabel.Text = "Status: Auto-farm " .. dest.name; StatusLabel.TextColor3 = COLOR.Success; setAutoBtn.Text = "Tersimpan"; task.wait(1.2); setAutoBtn.Text = "Set Auto-Farm" end)
     end
 
     local function refreshDestList()
@@ -1107,19 +1106,19 @@ local function startCarTool()
             userConfig.destinationCache = userConfig.destinationCache or {}; userConfig.destinationCache[pid] = cache; markSaveDirty()
         else destinations = getCachedDestinations() end
 
-        if #destinations == 0 then DestEmptyLabel.Visible = true; DestStatus.Text = "❌ 0 destinasi"; DestStatus.TextColor3 = COLOR.Error
-        else DestEmptyLabel.Visible = false; DestStatus.Text = "✅ " .. #destinations .. " destinasi"; DestStatus.TextColor3 = COLOR.Success; for i, d in ipairs(destinations) do pcall(buildDestRow, d, i) end end
+        if #destinations == 0 then DestEmptyLabel.Visible = true; DestStatus.Text = "0 destinasi"; DestStatus.TextColor3 = COLOR.Error
+        else DestEmptyLabel.Visible = false; DestStatus.Text = "" .. #destinations .. " destinasi"; DestStatus.TextColor3 = COLOR.Success; for i, d in ipairs(destinations) do pcall(buildDestRow, d, i) end end
         DestList.CanvasSize = UDim2.new(0, 0, 0, #destinations * 58 + 12)
     end
     task.spawn(function() task.wait(1); pcall(refreshDestList) end)
-    ScanDestBtn.MouseButton1Click:Connect(function() ScanDestBtn.Text = "⏳ Scan..."; pcall(refreshDestList); ScanDestBtn.Text = "✅ Selesai!"; task.wait(1.2); ScanDestBtn.Text = "🔄 Scan Ulang" end)
+    ScanDestBtn.MouseButton1Click:Connect(function() ScanDestBtn.Text = "..."; pcall(refreshDestList); ScanDestBtn.Text = "Selesai!"; task.wait(1.2); ScanDestBtn.Text = "Scan Ulang" end)
 
     new("Frame", {Size = UDim2.new(1,0,0,1), BackgroundColor3 = COLOR.White, BackgroundTransparency = 0.8, BorderSizePixel = 0, LayoutOrder = 7.9, ZIndex = 120, Parent = Content})
-    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "🚚  LOADING POINT (FAR-LOAD)", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 7.91, ZIndex = 120, Parent = Content})
+    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "[LOADING POINT]", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 7.91, ZIndex = 120, Parent = Content})
     local LoadStatusRow = new("Frame", {Size = UDim2.new(1,0,0,42), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.3, BorderSizePixel = 0, LayoutOrder = 7.92, ZIndex = 120, Parent = Content})
     corner(LoadStatusRow, 10); new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = LoadStatusRow})
-    local LoadStatus = new("TextLabel", {Size = UDim2.new(0.55,0,1,0), Position = UDim2.new(0,10,0,0), BackgroundTransparency = 1, Text = "⏳ Belum scan", TextColor3 = COLOR.TextDim, Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 130, Parent = LoadStatusRow})
-    local ScanLoadBtn = new("TextButton", {Size = UDim2.new(0.38,0,1,-10), Position = UDim2.new(0.6,0,0,5), BackgroundColor3 = COLOR.GreyDark, BorderSizePixel = 0, Text = "🔄 Scan Muatan", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11, ZIndex = 130, Parent = LoadStatusRow})
+    local LoadStatus = new("TextLabel", {Size = UDim2.new(0.55,0,1,0), Position = UDim2.new(0,10,0,0), BackgroundTransparency = 1, Text = "Belum scan", TextColor3 = COLOR.TextDim, Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 130, Parent = LoadStatusRow})
+    local ScanLoadBtn = new("TextButton", {Size = UDim2.new(0.38,0,1,-10), Position = UDim2.new(0.6,0,0,5), BackgroundColor3 = COLOR.GreyDark, BorderSizePixel = 0, Text = "Scan Muatan", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11, ZIndex = 130, Parent = LoadStatusRow})
     corner(ScanLoadBtn, 8)
     local LoadList = new("ScrollingFrame", {Size = UDim2.new(1,0,0,140), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.4, BorderSizePixel = 0, ScrollBarThickness = 3, ScrollBarImageColor3 = COLOR.White, CanvasSize = UDim2.new(0,0,0,0), LayoutOrder = 7.93, ZIndex = 120, Parent = Content})
     corner(LoadList, 10)
@@ -1130,21 +1129,21 @@ local function startCarTool()
     local function buildLoadRow(load, index)
         local row = new("Frame", {Size = UDim2.new(1,0,0,54), BackgroundColor3 = COLOR.GreyDark, BackgroundTransparency = 0.2, BorderSizePixel = 0, LayoutOrder = index, ZIndex = 121, Parent = LoadList})
         corner(row, 8); new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = row})
-        new("TextLabel", {Size = UDim2.new(1,-16,0,20), Position = UDim2.new(0,8,0,4), BackgroundTransparency = 1, Text = "📦 " .. load.name, TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 122, Parent = row})
-        new("TextLabel", {Size = UDim2.new(1,-16,0,12), Position = UDim2.new(0,8,0,22), BackgroundTransparency = 1, Text = string.format("X:%d Y:%d Z:%d • Dist ≤ %d", math.floor(load.position.X), math.floor(load.position.Y), math.floor(load.position.Z), load.maxDist), TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 122, Parent = row})
-        local farLoadBtn = new("TextButton", {Size = UDim2.new(0.48,-3,0,22), Position = UDim2.new(0,6,0,30), BackgroundColor3 = COLOR.Black, Text = "⚡ Far-Load", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
+        new("TextLabel", {Size = UDim2.new(1,-16,0,20), Position = UDim2.new(0,8,0,4), BackgroundTransparency = 1, Text = load.name, TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 122, Parent = row})
+        new("TextLabel", {Size = UDim2.new(1,-16,0,12), Position = UDim2.new(0,8,0,22), BackgroundTransparency = 1, Text = string.format("X:%d Y:%d Z:%d Dist:%d", math.floor(load.position.X), math.floor(load.position.Y), math.floor(load.position.Z), load.maxDist), TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 122, Parent = row})
+        local farLoadBtn = new("TextButton", {Size = UDim2.new(0.48,-3,0,22), Position = UDim2.new(0,6,0,30), BackgroundColor3 = COLOR.Black, Text = "Far-Load", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
         corner(farLoadBtn, 6); new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = farLoadBtn})
-        local farLoadLoopBtn = new("TextButton", {Size = UDim2.new(0.48,-12,0,22), Position = UDim2.new(0.5,9,0,30), BackgroundColor3 = COLOR.White, Text = "🔁 Loop 5x", TextColor3 = COLOR.Black, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
+        local farLoadLoopBtn = new("TextButton", {Size = UDim2.new(0.48,-12,0,22), Position = UDim2.new(0.5,9,0,30), BackgroundColor3 = COLOR.White, Text = "Loop 5x", TextColor3 = COLOR.Black, Font = Enum.Font.GothamBold, TextSize = 10, BorderSizePixel = 0, ZIndex = 122, Parent = row})
         corner(farLoadLoopBtn, 6)
-        farLoadBtn.MouseButton1Click:Connect(function() farLoadBtn.Text = "⏳..."; task.spawn(function() farLoadItem(load.name, StatusLabel) end); task.wait(0.3); farLoadBtn.Text = "✅ Done"; task.wait(0.8); farLoadBtn.Text = "⚡ Far-Load" end)
+        farLoadBtn.MouseButton1Click:Connect(function() farLoadBtn.Text = "..."; task.spawn(function() farLoadItem(load.name, StatusLabel) end); task.wait(0.3); farLoadBtn.Text = "Done"; task.wait(0.8); farLoadBtn.Text = "Far-Load" end)
         farLoadLoopBtn.MouseButton1Click:Connect(function()
-            farLoadLoopBtn.Text = "🔁 Running..."; farLoadLoopBtn.BackgroundColor3 = COLOR.Error; farLoadLoopBtn.TextColor3 = COLOR.White
+            farLoadLoopBtn.Text = "Running..."; farLoadLoopBtn.BackgroundColor3 = COLOR.Error; farLoadLoopBtn.TextColor3 = COLOR.White
             task.spawn(function()
                 for i = 1, 5 do
-                    if StatusLabel then StatusLabel.Text = "🔁 Loop " .. i .. "/5: " .. load.name; StatusLabel.TextColor3 = COLOR.White end
+                    if StatusLabel then StatusLabel.Text = "Loop " .. i .. "/5: " .. load.name; StatusLabel.TextColor3 = COLOR.White end
                     farLoadItem(load.name, StatusLabel); task.wait(0.5)
                 end
-                farLoadLoopBtn.Text = "✅ Selesai!"; task.wait(1); farLoadLoopBtn.Text = "🔁 Loop 5x"; farLoadLoopBtn.BackgroundColor3 = COLOR.White; farLoadLoopBtn.TextColor3 = COLOR.Black
+                farLoadLoopBtn.Text = "Selesai!"; task.wait(1); farLoadLoopBtn.Text = "Loop 5x"; farLoadLoopBtn.BackgroundColor3 = COLOR.White; farLoadLoopBtn.TextColor3 = COLOR.Black
             end)
         end)
     end
@@ -1152,19 +1151,19 @@ local function startCarTool()
     local function refreshLoadList()
         for _, c in pairs(LoadList:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
         local loads = scanLoadingPoints()
-        if #loads == 0 then LoadEmptyLabel.Visible = true; LoadStatus.Text = "❌ 0 loading point"; LoadStatus.TextColor3 = COLOR.Error
-        else LoadEmptyLabel.Visible = false; LoadStatus.Text = "✅ " .. #loads .. " loading point"; LoadStatus.TextColor3 = COLOR.Success; for i, l in ipairs(loads) do pcall(buildLoadRow, l, i) end end
+        if #loads == 0 then LoadEmptyLabel.Visible = true; LoadStatus.Text = "0 loading point"; LoadStatus.TextColor3 = COLOR.Error
+        else LoadEmptyLabel.Visible = false; LoadStatus.Text = "" .. #loads .. " loading point"; LoadStatus.TextColor3 = COLOR.Success; for i, l in ipairs(loads) do pcall(buildLoadRow, l, i) end end
         LoadList.CanvasSize = UDim2.new(0, 0, 0, #loads * 60 + 12)
     end
     task.spawn(function() task.wait(2); pcall(refreshLoadList) end)
-    ScanLoadBtn.MouseButton1Click:Connect(function() ScanLoadBtn.Text = "⏳ Scan..."; pcall(refreshLoadList); ScanLoadBtn.Text = "✅ Selesai!"; task.wait(1.2); ScanLoadBtn.Text = "🔄 Scan Muatan" end)
+    ScanLoadBtn.MouseButton1Click:Connect(function() ScanLoadBtn.Text = "..."; pcall(refreshLoadList); ScanLoadBtn.Text = "Selesai!"; task.wait(1.2); ScanLoadBtn.Text = "Scan Muatan" end)
 
     new("Frame", {Size = UDim2.new(1,0,0,1), BackgroundColor3 = COLOR.White, BackgroundTransparency = 0.8, BorderSizePixel = 0, LayoutOrder = 8, ZIndex = 120, Parent = Content})
-    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "✈️  FLY MODE", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 9, ZIndex = 120, Parent = Content})
-    local FlyBtn, FlyLbl = makePremiumBtn(Content, "✈️  Fly: OFF", COLOR.GreyDark, COLOR.Black); FlyBtn.LayoutOrder = 10
+    new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "[FLY MODE]", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 9, ZIndex = 120, Parent = Content})
+    local FlyBtn, FlyLbl = makePremiumBtn(Content, "[Fly] OFF", COLOR.GreyDark, COLOR.Black); FlyBtn.LayoutOrder = 10
     local FlySpeedRow = new("Frame", {Size = UDim2.new(1,0,0,38), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.4, BorderSizePixel = 0, LayoutOrder = 11, ZIndex = 120, Parent = Content})
     corner(FlySpeedRow, 8)
-    new("TextLabel", {Size = UDim2.new(0.42,0,1,0), Position = UDim2.new(0,10,0,0), BackgroundTransparency = 1, Text = "✈️ Fly Speed:", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 130, Parent = FlySpeedRow})
+    new("TextLabel", {Size = UDim2.new(0.42,0,1,0), Position = UDim2.new(0,10,0,0), BackgroundTransparency = 1, Text = "Fly Speed:", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 130, Parent = FlySpeedRow})
     local FlySpeedBox = new("TextBox", {Size = UDim2.new(0.52,0,1,-8), Position = UDim2.new(0.44,0,0,4), BackgroundColor3 = COLOR.Black, PlaceholderText = "Default: 60", Text = tostring(flySpeed), TextColor3 = COLOR.White, PlaceholderColor3 = COLOR.TextDim, Font = Enum.Font.GothamBold, TextSize = 12, BorderSizePixel = 0, ZIndex = 130, Parent = FlySpeedRow})
     corner(FlySpeedBox, 6); new("UIStroke", {Thickness = 1, Color = COLOR.White, Transparency = 0.5, Parent = FlySpeedBox})
     local StatusLabel = new("TextLabel", {Size = UDim2.new(1,0,0,22), BackgroundTransparency = 1, Text = "Status: Siap digunakan", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 12, ZIndex = 120, Parent = Content})
@@ -1190,14 +1189,14 @@ local function startCarTool()
         local char = LocalPlayer.Character; if not char then return end
         local hrp = char:FindFirstChild("HumanoidRootPart"); if not hrp then return end
         slotCounter = slotCounter + 1; table.insert(savedPositions, {name = "Slot " .. slotCounter, pos = hrp.Position}); markSaveDirty(); refreshPositionList()
-        SaveLbl.Text = "✅  Tersimpan (Slot " .. slotCounter .. ")"; StatusLabel.Text = "Status: Disave ke Slot " .. slotCounter
-        task.wait(1.2); SaveLbl.Text = "💾  Save Posisi ke Slot Baru"
+        SaveLbl.Text = "Tersimpan (Slot " .. slotCounter .. ")"; StatusLabel.Text = "Status: Disave ke Slot " .. slotCounter
+        task.wait(1.2); SaveLbl.Text = "[Save] Posisi ke Slot Baru"
     end)
     bind(FindBtn.MouseButton1Click, function()
         targetVehicleRoot = findNearestCar()
-        if targetVehicleRoot then FindLbl.Text = "✅  " .. targetVehicleRoot.Name; StatusLabel.Text = "Status: Target ditemukan"
-        else FindLbl.Text = "❌  Tidak ada target"; StatusLabel.Text = "Status: Tidak ada target" end
-        task.wait(1.5); FindLbl.Text = "🔍  Cari Target Terdekat"
+        if targetVehicleRoot then FindLbl.Text = targetVehicleRoot.Name; StatusLabel.Text = "Status: Target ditemukan"
+        else FindLbl.Text = "Tidak ada target"; StatusLabel.Text = "Status: Tidak ada target" end
+        task.wait(1.5); FindLbl.Text = "[Cari] Target Terdekat"
     end)
     bind(SwitchBtn.MouseButton1Click, function()
         farmToggleActive = not farmToggleActive; setSwitchVisual(farmToggleActive)
@@ -1205,13 +1204,13 @@ local function startCarTool()
     end)
     bind(FlyBtn.MouseButton1Click, function()
         toggleFly()
-        if flyEnabled then FlyLbl.Text = "✈️  Fly: ON"; FlyBtn.BackgroundColor3 = COLOR.White; FlyLbl.TextColor3 = COLOR.Black; StatusLabel.Text = "Status: Fly aktif"
-        else FlyLbl.Text = "✈️  Fly: OFF"; FlyBtn.BackgroundColor3 = COLOR.GreyDark; FlyLbl.TextColor3 = COLOR.White; StatusLabel.Text = "Status: Fly nonaktif" end
+        if flyEnabled then FlyLbl.Text = "[Fly] ON"; FlyBtn.BackgroundColor3 = COLOR.White; FlyLbl.TextColor3 = COLOR.Black; StatusLabel.Text = "Status: Fly aktif"
+        else FlyLbl.Text = "[Fly] OFF"; FlyBtn.BackgroundColor3 = COLOR.GreyDark; FlyLbl.TextColor3 = COLOR.White; StatusLabel.Text = "Status: Fly nonaktif" end
     end)
     bind(FlySpeedBox.FocusLost, function()
         local v = tonumber(FlySpeedBox.Text)
-        if v and v > 0 and v <= 500 then flySpeed = v; markSaveDirty(); StatusLabel.Text = "Status: Fly speed → " .. v
-        else FlySpeedBox.Text = tostring(flySpeed); StatusLabel.Text = "⚠️ Fly speed harus 1-500" end
+        if v and v > 0 and v <= 500 then flySpeed = v; markSaveDirty(); StatusLabel.Text = "Status: Fly speed " .. v
+        else FlySpeedBox.Text = tostring(flySpeed); StatusLabel.Text = "Fly speed harus 1-500" end
     end)
     bind(UserInputService.InputBegan, function(input, gp)
         if gp then return end
@@ -1220,11 +1219,11 @@ local function startCarTool()
             if #savedPositions > 0 then teleportCarToPos(savedPositions[#savedPositions].pos) end
         elseif input.KeyCode == Enum.KeyCode.F then
             toggleFly()
-            if flyEnabled then FlyLbl.Text = "✈️  Fly: ON"; FlyBtn.BackgroundColor3 = COLOR.White; FlyLbl.TextColor3 = COLOR.Black
-            else FlyLbl.Text = "✈️  Fly: OFF"; FlyBtn.BackgroundColor3 = COLOR.GreyDark; FlyLbl.TextColor3 = COLOR.White end
+            if flyEnabled then FlyLbl.Text = "[Fly] ON"; FlyBtn.BackgroundColor3 = COLOR.White; FlyLbl.TextColor3 = COLOR.Black
+            else FlyLbl.Text = "[Fly] OFF"; FlyBtn.BackgroundColor3 = COLOR.GreyDark; FlyLbl.TextColor3 = COLOR.White end
         elseif input.KeyCode == Enum.KeyCode.RightControl then toggleGUI() end
     end)
-    print("[BSTS-ID] ✅ v4.3 Mono Glossy Edition siap!")
+    print("[BSTS-ID] v4.3 Mono Glossy Edition siap!")
 end
 
 task.spawn(function()
