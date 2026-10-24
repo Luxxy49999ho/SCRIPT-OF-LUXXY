@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════
--- BSTS-ID - LuxxyHub v5.0 (Sidebar UI Edition)
+-- BSTS-ID - LuxxyHub v9.3 (New Logo - Full Fix)
 -- ═══════════════════════════════════════════════════════════════
 
 local CONFIG = {
@@ -12,7 +12,7 @@ local CONFIG = {
     DestinationFolder = "DESTINASI POINT",
     DestinationPrefix = "DestinationPoint_",
     LoadFolder = "SEMUA MUATAN",
-    LoadPromptAction = "Muat ke Truck",
+    LoadPromptAction = "muat",
     FarLoadOffset = 4,
     TruckSpawnerFolder = "TruckSpawnerRemotes",
     SpawnTruckRemote = "SpawnTruck",
@@ -36,9 +36,9 @@ local CONFIG = {
 local DEFAULT_SLOT19 = Vector3.new(-527, 95, 305)
 local DEFAULT_SLOT20 = Vector3.new(2482, 380, -607)
 
-local IMG_TOGGLE = "rbxassetid://125806010780793"
-local IMG_LOGO = "rbxassetid://72484610504506"
--- Icon Icon UI Roblox Putih
+local IMG_TOGGLE = "rbxassetid://88353934832481"
+-- LOGO DIGANTI SESUAI PERMINTAAN
+local IMG_LOGO = "rbxassetid://88353934832481"
 local ICON_HOME = "rbxassetid://6031094667"
 local ICON_CONFIG = "rbxassetid://6031090990"
 local ICON_SETTINGS = "rbxassetid://6031091004"
@@ -124,7 +124,6 @@ local function createGlossyBorder(parent, thickness)
     return stroke
 end
 
--- Gradient Diam
 local function applyStaticGradient(parent)
     local grad = Instance.new("UIGradient")
     grad.Color = ColorSequence.new({
@@ -492,28 +491,52 @@ local function startCarTool()
     end
 
     local function fireCollect()
-        local prompt = nil
-        local folder = workspace:FindFirstChild("SEMUA MUATAN")
-        local searchArea = folder or workspace
+        local char = LocalPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return false end
+
+        local bestPrompt = nil
+        local shortestDist = math.huge
         
-        for _, o in pairs(searchArea:GetDescendants()) do
+        local folder = workspace:FindFirstChild(CONFIG.LoadFolder) or workspace
+        
+        for _, o in pairs(folder:GetDescendants()) do
             if o:IsA("ProximityPrompt") and o.Enabled then
                 local action = string.lower(o.ActionText or "")
-                if action:find("muat", 1, true) or action:find("pupuk", 1, true) then
-                    prompt = o
-                    break
+                local objText = string.lower(o.ObjectText or "")
+                
+                if action:find("muat", 1, true) or action:find("memuat", 1, true) or objText:find("pupuk", 1, true) then
+                    local parent = o.Parent
+                    local basePart = parent
+                    if parent and not parent:IsA("BasePart") then
+                        basePart = parent:FindFirstChildWhichIsA("BasePart")
+                    end
+                    
+                    if basePart then
+                        local dist = (basePart.Position - hrp.Position).Magnitude
+                        if dist < shortestDist then
+                            shortestDist = dist
+                            bestPrompt = o
+                        end
+                    end
                 end
             end
         end
         
-        if prompt then
+        if bestPrompt then
+            print("[BSTS-ID] Auto-load: " .. (bestPrompt.ActionText or "Muat") .. " (Jarak: " .. math.floor(shortestDist) .. ")")
             if fireproximityprompt then
-                pcall(function() fireproximityprompt(prompt) end)
-            else
-                pcall(function() prompt:InputHoldBegin(); task.wait(0.3); prompt:InputHoldEnd() end)
+                local success = pcall(function() fireproximityprompt(bestPrompt) end)
+                if success then return true end
             end
+            pcall(function()
+                bestPrompt:InputHoldBegin()
+                task.wait((bestPrompt.HoldDuration or 1) + 0.2)
+                bestPrompt:InputHoldEnd()
+            end)
             return true
         end
+        print("[BSTS-ID] Prompt muat tidak ditemukan.")
         return false
     end
 
@@ -692,19 +715,21 @@ local function startCarTool()
                     
                     if statusLbl then statusLbl.Text = "[1/6] TP Slot 19..."; statusLbl.TextColor3 = COLOR.White end
                     teleportCarToPos(pos19)
-                    task.wait(1.5)
+                    task.wait(2.5)
+                    
                     if statusLbl then statusLbl.Text = "[2/6] Muat Slot 19..." end
                     fireCollect()
-                    task.wait(2.5)
+                    task.wait(3)
                     
                     if not farmEnabled then break end
 
                     if statusLbl then statusLbl.Text = "[3/6] TP Slot 20..." end
                     teleportCarToPos(pos20)
-                    task.wait(1.5)
+                    task.wait(2.5)
+                    
                     if statusLbl then statusLbl.Text = "[4/6] Muat Slot 20..." end
                     fireCollect()
-                    task.wait(2.5)
+                    task.wait(3)
                     
                     if not farmEnabled then break end
 
@@ -725,23 +750,22 @@ local function startCarTool()
     end
 
     -- ═══════════════════════════════════════════════════════════════
-    -- 🎨 UI BUILDER (SIDEBAR EDITION)
+    -- 🎨 UI BUILDER (SIDEBAR EDITION FIXED ACTIVATED)
     -- ═══════════════════════════════════════════════════════════════
     local cam = workspace.CurrentCamera
     local vp = (cam and cam.ViewportSize) or Vector2.new(1280, 720)
     if vp.X <= 0 or vp.Y <= 0 then vp = Vector2.new(1280, 720) end
     
-    local guiW = 550 -- Lebar kesamping
-    local guiH = math.clamp(400, 300, vp.Y - 60) -- Ukuran tinggi sama kayak dulu
+    local guiW = 550 
+    local guiH = math.clamp(400, 300, vp.Y - 60) 
 
-    local ScreenGui = track(new("ScreenGui", {Name = "BSTS_LuxxyHub", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling, IgnoreGuiInset = true, DisplayOrder = 100, Parent = getSafeGuiParent()}))
-    local ToggleWrapper = track(new("Frame", {Name = "ToggleWrapper", AnchorPoint = Vector2.new(0, 0), Size = UDim2.new(0, 60, 0, 60), Position = UDim2.new(0, startX, 0, startY), BackgroundTransparency = 1, ZIndex = 200, Parent = ScreenGui}))
+    local ScreenGui = track(new("ScreenGui", {Name = "BSTS_LuxxyHub", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Global, IgnoreGuiInset = true, DisplayOrder = 100, Parent = getSafeGuiParent()}))
+    local ToggleWrapper = track(new("Frame", {Name = "ToggleWrapper", AnchorPoint = Vector2.new(0, 0), Size = UDim2.new(0, 60, 0, 60), Position = UDim2.new(0, startX, 0, startY), BackgroundTransparency = 1, ZIndex = 500, Parent = ScreenGui}))
     
-    local ToggleBtn = new("TextButton", {Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = COLOR.Black, BorderSizePixel = 0, Text = "", AutoButtonColor = false, Active = true, ZIndex = 202, Parent = ToggleWrapper})
-    corner(ToggleBtn, 30); createGlossyBorder(ToggleBtn, 2); 
-    new("ImageLabel", {Size = UDim2.new(0.75, 0, 0.75, 0), Position = UDim2.new(0.5, 0, 0.5, 0), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 1, Image = IMG_TOGGLE, ImageColor3 = COLOR.White, ScaleType = Enum.ScaleType.Fit, ZIndex = 203, Parent = ToggleBtn})
+    local ToggleBtn = new("TextButton", {Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = COLOR.Black, BorderSizePixel = 0, Text = "", AutoButtonColor = false, Active = true, ZIndex = 501, Parent = ToggleWrapper})
+    corner(ToggleBtn, 30); createGlossyBorder(ToggleBtn, 2)
+    new("ImageLabel", {Size = UDim2.new(0.75, 0, 0.75, 0), Position = UDim2.new(0.5, 0, 0.5, 0), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 1, Image = IMG_TOGGLE, ImageColor3 = COLOR.White, ScaleType = Enum.ScaleType.Fit, ZIndex = 502, Parent = ToggleBtn})
 
-    -- Main Frame
     local MainWrapper = track(new("Frame", {
         Name = "MainWrapper", 
         AnchorPoint = Vector2.new(0.5, 0.5), 
@@ -749,7 +773,7 @@ local function startCarTool()
         Position = UDim2.new(userConfig.guiX or 0.5, 0, userConfig.guiY or 0.5, 0), 
         BackgroundTransparency = 1, 
         Visible = false, 
-        ZIndex = 99, 
+        ZIndex = 400, 
         Parent = ScreenGui
     }))
     
@@ -759,42 +783,126 @@ local function startCarTool()
         BackgroundColor3 = COLOR.BG, 
         BorderSizePixel = 0, 
         Active = true, 
-        Draggable = true, 
         ClipsDescendants = true, 
-        ZIndex = 100, 
+        ZIndex = 401, 
         Parent = MainWrapper
     }))
     corner(MainFrame, 12); createGlossyBorder(MainFrame, 2); applyStaticGradient(MainFrame)
+
+    -- ═══ LOGIKA TOGGLE (FIX 100% PAKAI ACTIVATED) ═══
+    local isDragging, dragStartPos, dragStartInput, hasMoved = false, nil, nil, false
+    local DRAG_THRESHOLD = 10 
+
+    bind(ToggleBtn.InputBegan, function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDragging = true; hasMoved = false
+            dragStartInput = Vector2.new(input.Position.X, input.Position.Y)
+            dragStartPos = ToggleWrapper.Position
+        end
+    end)
     
-    bind(MainFrame:GetPropertyChangedSignal("Position"), function()
-        if MainWrapper.Visible then userConfig.guiX = MainWrapper.Position.X.Scale; userConfig.guiY = MainWrapper.Position.Y.Scale; markSaveDirty() end
+    bind(UserInputService.InputChanged, function(input)
+        if not isDragging then return end
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            local currentInput = Vector2.new(input.Position.X, input.Position.Y)
+            local delta = currentInput - dragStartInput
+            if delta.Magnitude > DRAG_THRESHOLD then hasMoved = true end
+            if hasMoved then
+                local nx = dragStartPos.X.Offset + delta.X
+                local ny = dragStartPos.Y.Offset + delta.Y
+                local cx, cy = clampTogglePosition(nx, ny)
+                ToggleWrapper.Position = UDim2.new(0, cx, 0, cy)
+            end
+        end
+    end)
+    
+    bind(UserInputService.InputEnded, function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            if isDragging and hasMoved then
+                local cx, cy = clampTogglePosition(ToggleWrapper.Position.X.Offset, ToggleWrapper.Position.Y.Offset)
+                ToggleWrapper.Position = UDim2.new(0, cx, 0, cy)
+                if isTogglePositionValid(cx, cy) then userConfig.toggleOffsetX = cx; userConfig.toggleOffsetY = cy; markSaveDirty() end
+            end
+            isDragging = false; dragStartPos = nil; dragStartInput = nil
+        end
     end)
 
-    -- Header (Top Bar)
-    local Header = new("Frame", {Size = UDim2.new(1,0,0,40), BackgroundColor3 = COLOR.Black, BackgroundTransparency = 0.3, BorderSizePixel = 0, ZIndex = 150, Parent = MainFrame})
+    bind(ToggleBtn.Activated, function()
+        if hasMoved then return end
+        if MainWrapper.Visible then
+            MainWrapper.Visible = false
+        else
+            MainWrapper.Visible = true
+        end
+    end)
+    -- ═══════════════════════════════════════════════
+
+    -- Header
+    local Header = new("Frame", {Size = UDim2.new(1,0,0,40), BackgroundColor3 = COLOR.Black, BackgroundTransparency = 0.3, BorderSizePixel = 0, Active = true, ZIndex = 410, Parent = MainFrame})
     corner(Header, 12)
     applyStaticGradient(Header)
     
-    new("ImageLabel", {Size = UDim2.new(0, 24, 0, 24), Position = UDim2.new(0, 10, 0.5, -12), BackgroundTransparency = 1, Image = IMG_LOGO, ImageColor3 = COLOR.White, ScaleType = Enum.ScaleType.Fit, ZIndex = 151, Parent = Header})
-    new("TextLabel", {Size = UDim2.new(1,-100,1,-5), Position = UDim2.new(0,40,0,0), BackgroundTransparency = 1, Text = "LUXXY HUB", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 151, Parent = Header})
-    new("TextLabel", {Size = UDim2.new(0,100,0,12), Position = UDim2.new(0,40,1,-15), BackgroundTransparency = 1, Text = "BSTS-ID", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 151, Parent = Header})
+    -- ICON LOGO BARU DIGUNAKAN DI SINI
+    new("ImageLabel", {Size = UDim2.new(0, 24, 0, 24), Position = UDim2.new(0, 10, 0.5, -12), BackgroundTransparency = 1, Image = IMG_LOGO, ImageColor3 = COLOR.White, ScaleType = Enum.ScaleType.Fit, ZIndex = 411, Parent = Header})
     
-    -- Buttons Top Bar (Minimize & Close)
-    local MinimizeBtn = new("TextButton", {Size = UDim2.new(0,28,0,28), Position = UDim2.new(1,-70,0.5,-14), BackgroundColor3 = COLOR.GreyDark, Text = "-", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 18, BorderSizePixel = 0, ZIndex = 151, Parent = Header})
+    new("TextLabel", {Size = UDim2.new(1,-100,1,-5), Position = UDim2.new(0,40,0,0), BackgroundTransparency = 1, Text = "LUXXY HUB", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 411, Parent = Header})
+    new("TextLabel", {Size = UDim2.new(0,100,0,12), Position = UDim2.new(0,40,1,-15), BackgroundTransparency = 1, Text = "BSTS-ID", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 411, Parent = Header})
+    
+    local MinimizeBtn = new("TextButton", {Size = UDim2.new(0,28,0,28), Position = UDim2.new(1,-70,0.5,-14), BackgroundColor3 = COLOR.GreyDark, Text = "-", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 18, BorderSizePixel = 0, ZIndex = 411, Active = true, Parent = Header})
     corner(MinimizeBtn, 6)
-    local CloseBtn = new("TextButton", {Size = UDim2.new(0,28,0,28), Position = UDim2.new(1,-38,0.5,-14), BackgroundColor3 = COLOR.Error, Text = "X", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 14, BorderSizePixel = 0, ZIndex = 151, Parent = Header})
+    local CloseBtn = new("TextButton", {Size = UDim2.new(0,28,0,28), Position = UDim2.new(1,-38,0.5,-14), BackgroundColor3 = COLOR.Error, Text = "X", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 14, BorderSizePixel = 0, ZIndex = 411, Active = true, Parent = Header})
     corner(CloseBtn, 6)
 
-    -- Sidebar
-    local Sidebar = new("Frame", {Size = UDim2.new(0, 130, 1, -40), Position = UDim2.new(0, 0, 0, 40), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.2, BorderSizePixel = 0, ZIndex = 110, Parent = MainFrame})
-    local Divider = new("Frame", {Size = UDim2.new(0, 1, 1, -40), Position = UDim2.new(0, 130, 0, 40), BackgroundColor3 = COLOR.White, BackgroundTransparency = 0.8, BorderSizePixel = 0, ZIndex = 111, Parent = MainFrame})
-
-    local Content = new("Frame", {Size = UDim2.new(1, -131, 1, -40), Position = UDim2.new(0, 131, 0, 40), BackgroundTransparency = 1, ZIndex = 110, Parent = MainFrame})
+    -- Drag Fix: Pindah ke Header
+    local dragging = false
+    local dragInput, dragStart, startPos
+    local dragThreshold = 10
     
-    -- Tab Contents
+    bind(Header.InputBegan, function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = MainWrapper.Position
+        end
+    end)
+    
+    bind(Header.InputChanged, function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            if delta.Magnitude > dragThreshold then
+                MainWrapper.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+                userConfig.guiX = MainWrapper.Position.X.Scale; userConfig.guiY = MainWrapper.Position.Y.Scale; markSaveDirty()
+            end
+        end
+    end)
+    
+    bind(UserInputService.InputEnded, function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+
+    -- Sidebar
+    local Sidebar = new("Frame", {Size = UDim2.new(0, 130, 1, -40), Position = UDim2.new(0, 0, 0, 40), BackgroundColor3 = COLOR.BG2, BackgroundTransparency = 0.2, BorderSizePixel = 0, Active = true, ZIndex = 420, Parent = MainFrame})
+    local Divider = new("Frame", {Size = UDim2.new(0, 1, 1, -40), Position = UDim2.new(0, 130, 0, 40), BackgroundColor3 = COLOR.White, BackgroundTransparency = 0.8, BorderSizePixel = 0, ZIndex = 421, Parent = MainFrame})
+
+    local Content = new("Frame", {Size = UDim2.new(1, -131, 1, -40), Position = UDim2.new(0, 131, 0, 40), BackgroundTransparency = 1, Active = true, ZIndex = 420, Parent = MainFrame})
+    
     local Pages = {}
     local function createPage(name)
-        local p = new("ScrollingFrame", {Name = name, Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 2, ScrollBarImageColor3 = COLOR.White, CanvasSize = UDim2.new(0,0,0,0), AutomaticCanvasSize = Enum.AutomaticSize.Y, Visible = false, ZIndex = 112, Parent = Content})
+        local p = new("ScrollingFrame", {
+            Name = name, 
+            Size = UDim2.new(1, 0, 1, 0), 
+            BackgroundTransparency = 1, 
+            BorderSizePixel = 0, 
+            ScrollBarThickness = 2, 
+            CanvasSize = UDim2.new(0,0,0,0), 
+            AutomaticCanvasSize = Enum.AutomaticSize.Y,
+            Visible = false, 
+            Active = true,
+            ZIndex = 430, 
+            Parent = Content
+        })
         new("UIListLayout", {SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 8), Parent = p})
         new("UIPadding", {PaddingTop = UDim.new(0, 10), PaddingBottom = UDim.new(0, 10), PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10), Parent = p})
         Pages[name] = p
@@ -805,40 +913,45 @@ local function startCarTool()
     local ConfigPage = createPage("Config")
     local SettingsPage = createPage("Settings")
 
-    -- Sidebar Nav Logic
     local activeTab = nil
     local function switchTab(tabName)
         if activeTab == tabName then return end
         for name, p in pairs(Pages) do p.Visible = false end
-        Pages[tabName].Visible = true
-        activeTab = tabName
+        if Pages[tabName] then
+            Pages[tabName].Visible = true
+            activeTab = tabName
+        end
     end
 
+    -- NAV BUTTONS FIX: Activated
     local function makeNavBtn(text, iconId, order, pageName)
-        local btn = new("TextButton", {Size = UDim2.new(1, -10, 0, 36), Position = UDim2.new(0, 5, 0, 0), BackgroundColor3 = COLOR.White, BackgroundTransparency = 1, Text = "", ZIndex = 115, LayoutOrder = order, Parent = Sidebar})
-        -- We use UDim2 position manually if not using UIListLayout in sidebar. Let's use manual.
-        btn.Position = UDim2.new(0, 5, 0, 10 + ((order-1) * 40))
+        local btn = new("TextButton", {Size = UDim2.new(1, -10, 0, 36), Position = UDim2.new(0, 5, 0, 10 + ((order-1) * 45)), BackgroundColor3 = COLOR.GreyDark, BackgroundTransparency = 0.9, Text = "", Active = true, ZIndex = 425, Parent = Sidebar})
         corner(btn, 6)
         
-        local icon = new("ImageLabel", {Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(0, 8, 0.5, -10), BackgroundTransparency = 1, Image = iconId, ImageColor3 = COLOR.TextDim, ZIndex = 116, Parent = btn})
-        local lbl = new("TextLabel", {Size = UDim2.new(1, -36, 1, 0), Position = UDim2.new(0, 34, 0, 0), BackgroundTransparency = 1, Text = text, TextColor3 = COLOR.TextDim, Font = Enum.Font.GothamBold, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 116, Parent = btn})
+        local icon = new("ImageLabel", {Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(0, 8, 0.5, -10), BackgroundTransparency = 1, Image = iconId, ImageColor3 = COLOR.TextDim, ZIndex = 426, Parent = btn})
+        local lbl = new("TextLabel", {Size = UDim2.new(1, -36, 1, 0), Position = UDim2.new(0, 34, 0, 0), BackgroundTransparency = 1, Text = text, TextColor3 = COLOR.TextDim, Font = Enum.Font.GothamBold, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 426, Parent = btn})
         
-        btn.MouseButton1Click:Connect(function()
+        btn.Activated:Connect(function()
             switchTab(pageName)
             for _, child in pairs(Sidebar:GetChildren()) do
                 if child:IsA("TextButton") then
-                    child.BackgroundTransparency = 1
+                    child.BackgroundTransparency = 0.9
                     for _, c in pairs(child:GetChildren()) do
-                        if c:IsA("ImageLabel") or c:IsA("TextLabel") then c.ImageColor3 = COLOR.TextDim; c.TextColor3 = COLOR.TextDim end
+                        if c:IsA("ImageLabel") then c.ImageColor3 = COLOR.TextDim end
+                        if c:IsA("TextLabel") then c.TextColor3 = COLOR.TextDim end
                     end
                 end
             end
-            btn.BackgroundTransparency = 0.8
+            btn.BackgroundTransparency = 0.5
             icon.ImageColor3 = COLOR.White
             lbl.TextColor3 = COLOR.White
         end)
+        
         if activeTab == nil then
-            btn.MouseButton1Click:Fire()
+            switchTab(pageName)
+            btn.BackgroundTransparency = 0.5
+            icon.ImageColor3 = COLOR.White
+            lbl.TextColor3 = COLOR.White
         end
         return btn
     end
@@ -847,30 +960,27 @@ local function startCarTool()
     makeNavBtn("CONFIG", ICON_CONFIG, 2, "Config")
     makeNavBtn("SETTINGS", ICON_SETTINGS, 3, "Settings")
 
-    -- Custom Button Maker for Content
+    -- PREMIUM BTNS FIX: Activated
     local function makePremiumBtn(parent, text, c1, c2, h)
         h = h or 35
-        local btn = new("TextButton", {Size = UDim2.new(1,0,0,h), BackgroundColor3 = COLOR.GreyDark, Text = "", BorderSizePixel = 0, AutoButtonColor = false, ZIndex = 120, Parent = parent})
+        local btn = new("TextButton", {Size = UDim2.new(1,0,0,h), BackgroundColor3 = COLOR.GreyDark, Text = "", BorderSizePixel = 0, AutoButtonColor = false, Active = true, ZIndex = 435, Parent = parent})
         corner(btn, 8); createGlossyBorder(btn, 1)
-        local lbl = new("TextLabel", {Size = UDim2.new(1,-20,1,0), Position = UDim2.new(0,10,0,0), BackgroundTransparency = 1, Text = text, TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 121, Parent = btn})
+        local lbl = new("TextLabel", {Size = UDim2.new(1,-20,1,0), Position = UDim2.new(0,10,0,0), BackgroundTransparency = 1, Text = text, TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 436, Parent = btn})
         btn.MouseEnter:Connect(function() pcall(function() tween(btn, {BackgroundColor3 = COLOR.GreyMed}, 0.2):Play() end) end)
         btn.MouseLeave:Connect(function() pcall(function() tween(btn, {BackgroundColor3 = COLOR.GreyDark}, 0.2):Play() end) end)
         return btn, lbl
     end
 
-    -- ═══════════════════════════════════════════════════════════════
-    -- ISI TAB HOME (AUTO FARM, SPAWN, DLL)
-    -- ═══════════════════════════════════════════════════════════════
-    local HomeTitle = new("TextLabel", {Size = UDim2.new(1,0,0,25), BackgroundTransparency = 1, Text = "MAIN MENU", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 1, Parent = HomePage})
+    -- ═══ ISI TAB HOME ═══
+    local HomeTitle = new("TextLabel", {Size = UDim2.new(1,0,0,25), BackgroundTransparency = 1, Text = "MAIN MENU", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 1, ZIndex = 431, Parent = HomePage})
     
-    -- Auto Farm Toggle
-    local FarmToggleRow = new("Frame", {Size = UDim2.new(1,0,0,45), BackgroundColor3 = COLOR.GreyDark, BorderSizePixel = 0, LayoutOrder = 2, Parent = HomePage})
+    local FarmToggleRow = new("Frame", {Size = UDim2.new(1,0,0,45), BackgroundColor3 = COLOR.GreyDark, BorderSizePixel = 0, Active = true, LayoutOrder = 2, ZIndex = 431, Parent = HomePage})
     corner(FarmToggleRow, 8)
-    local FarmLabel = new("TextLabel", {Size = UDim2.new(0.55,0,1,0), Position = UDim2.new(0,12,0,0), BackgroundTransparency = 1, Text = "AUTO FARM: OFF", TextColor3 = COLOR.Error, Font = Enum.Font.GothamBold, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, Parent = FarmToggleRow})
-    local SwitchBg = new("Frame", {Size = UDim2.new(0,50,0,24), Position = UDim2.new(1,-62,0.5,-12), BackgroundColor3 = COLOR.GreyMed, BorderSizePixel = 0, Parent = FarmToggleRow})
+    local FarmLabel = new("TextLabel", {Size = UDim2.new(0.55,0,1,0), Position = UDim2.new(0,12,0,0), BackgroundTransparency = 1, Text = "AUTO FARM: OFF", TextColor3 = COLOR.Error, Font = Enum.Font.GothamBold, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 432, Parent = FarmToggleRow})
+    local SwitchBg = new("Frame", {Size = UDim2.new(0,50,0,24), Position = UDim2.new(1,-62,0.5,-12), BackgroundColor3 = COLOR.GreyMed, BorderSizePixel = 0, ZIndex = 432, Parent = FarmToggleRow})
     corner(SwitchBg, 12)
-    local SwitchBtn = new("TextButton", {Size = UDim2.new(1,0,1,0), BackgroundTransparency = 1, Text = "", Parent = SwitchBg})
-    local SwitchKnob = new("Frame", {Size = UDim2.new(0,18,0,18), Position = UDim2.new(0,3,0.5,-9), BackgroundColor3 = COLOR.White, BorderSizePixel = 0, Parent = SwitchBg})
+    local SwitchBtn = new("TextButton", {Size = UDim2.new(1,0,1,0), BackgroundTransparency = 1, Text = "", Active = true, ZIndex = 433, Parent = SwitchBg})
+    local SwitchKnob = new("Frame", {Size = UDim2.new(0,18,0,18), Position = UDim2.new(0,3,0.5,-9), BackgroundColor3 = COLOR.White, BorderSizePixel = 0, ZIndex = 434, Parent = SwitchBg})
     corner(SwitchKnob, 9)
 
     local farmToggleActive = false
@@ -884,59 +994,63 @@ local function startCarTool()
         end
     end
 
-    local StatusLabel = new("TextLabel", {Size = UDim2.new(1,0,0,18), BackgroundTransparency = 1, Text = "Status: Siap digunakan", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 3, Parent = HomePage})
+    local StatusLabel = new("TextLabel", {Size = UDim2.new(1,0,0,18), BackgroundTransparency = 1, Text = "Status: Siap digunakan", TextColor3 = COLOR.TextDim, Font = Enum.Font.Gotham, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 3, ZIndex = 431, Parent = HomePage})
     
-    -- Spawn Truck Area
-    local SpawnTitle = new("TextLabel", {Size = UDim2.new(1,0,0,20), BackgroundTransparency = 1, Text = "SPAWN TRUCK", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 4, Parent = HomePage})
-    local TruckList = new("ScrollingFrame", {Size = UDim2.new(1,0,0,200), BackgroundColor3 = COLOR.BG2, BorderSizePixel = 0, ScrollBarThickness = 2, LayoutOrder = 5, Parent = HomePage})
+    local SpawnTitle = new("TextLabel", {Size = UDim2.new(1,0,0,20), BackgroundTransparency = 1, Text = "SPAWN TRUCK", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 4, ZIndex = 431, Parent = HomePage})
+    local TruckList = new("ScrollingFrame", {Size = UDim2.new(1,0,0,200), BackgroundColor3 = COLOR.BG2, BorderSizePixel = 0, ScrollBarThickness = 2, LayoutOrder = 5, Active = true, ZIndex = 431, Parent = HomePage})
     corner(TruckList, 8)
     new("UIPadding", {PaddingTop = UDim.new(0,6), PaddingBottom = UDim.new(0,6), PaddingLeft = UDim.new(0,6), PaddingRight = UDim.new(0,6), Parent = TruckList})
+    
     new("UIGridLayout", {CellSize = UDim2.new(0, 85, 0, 100), CellPadding = UDim2.new(0, 6, 0, 6), SortOrder = Enum.SortOrder.LayoutOrder, Parent = TruckList})
     
-    -- Logika Grid Truck
     local function loadTrucksForUI()
         for _, c in pairs(TruckList:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
         local tData = loadTruckData()
         for _, t in ipairs(tData) do
             if not isTrailerTruck(t.name) then
-                local card = new("Frame", {Size = UDim2.new(0, 85, 0, 100), BackgroundColor3 = COLOR.GreyDark, Parent = TruckList})
+                local card = new("Frame", {Size = UDim2.new(0, 85, 0, 100), BackgroundColor3 = COLOR.GreyDark, ZIndex = 432, Parent = TruckList})
                 corner(card, 6)
                 local imgId = t.photo and ("rbxassetid://" .. tostring(t.photo)) or ""
-                new("ImageLabel", {Size = UDim2.new(1,-4,0,55), Position = UDim2.new(0,2,0,2), BackgroundColor3 = COLOR.Black, Image = imgId, ScaleType = Enum.ScaleType.Fit, Parent = card})
-                new("TextLabel", {Size = UDim2.new(1,0,0,15), Position = UDim2.new(0,0,0,60), BackgroundColor3 = COLOR.Black, BackgroundTransparency=0.5, Text = t.name, TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 9, Parent = card})
-                new("TextLabel", {Size = UDim2.new(1,0,0,10), Position = UDim2.new(0,0,0,75), BackgroundTransparency = 1, Text = formatPrice(t.price), TextColor3 = COLOR.Success, Font = Enum.Font.Gotham, TextSize = 8, Parent = card})
-                local sBtn = new("TextButton", {Size = UDim2.new(1,-4,0,15), Position = UDim2.new(0,2,1,-18), BackgroundColor3 = COLOR.White, Text = "Spawn", TextColor3 = COLOR.Black, Font = Enum.Font.GothamBold, TextSize = 9, Parent = card})
+                new("ImageLabel", {Size = UDim2.new(1,-4,0,55), Position = UDim2.new(0,2,0,2), BackgroundColor3 = COLOR.Black, Image = imgId, ScaleType = Enum.ScaleType.Fit, ZIndex = 433, Parent = card})
+                new("TextLabel", {Size = UDim2.new(1,0,0,15), Position = UDim2.new(0,0,0,60), BackgroundColor3 = COLOR.Black, BackgroundTransparency=0.5, Text = t.name, TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 9, ZIndex = 433, Parent = card})
+                new("TextLabel", {Size = UDim2.new(1,0,0,10), Position = UDim2.new(0,0,0,75), BackgroundTransparency = 1, Text = formatPrice(t.price), TextColor3 = COLOR.Success, Font = Enum.Font.Gotham, TextSize = 8, ZIndex = 433, Parent = card})
+                local sBtn = new("TextButton", {Size = UDim2.new(1,-4,0,15), Position = UDim2.new(0,2,1,-18), BackgroundColor3 = COLOR.White, Text = "Spawn", TextColor3 = COLOR.Black, Font = Enum.Font.GothamBold, TextSize = 9, Active = true, ZIndex = 434, Parent = card})
                 corner(sBtn, 4)
-                sBtn.MouseButton1Click:Connect(function() sBtn.Text = "..."; spawnTruckByName(t.name); task.wait(0.5); sBtn.Text = "OK"; task.wait(0.8); sBtn.Text = "Spawn" end)
+                sBtn.Activated:Connect(function() 
+                    sBtn.Text = "..."; 
+                    spawnTruckByName(t.name); 
+                    task.wait(0.5); 
+                    sBtn.Text = "OK"; 
+                    task.wait(0.8); 
+                    sBtn.Text = "Spawn" 
+                end)
             end
         end
     end
-    task.spawn(loadTrucksForUI)
+    task.spawn(function() pcall(loadTrucksForUI) end)
 
-    -- ═══════════════════════════════════════════════════════════════
-    -- ISI TAB CONFIG (SIMPAN POSISI, TP PLAYER)
-    -- ═══════════════════════════════════════════════════════════════
-    local ConfigTitle = new("TextLabel", {Size = UDim2.new(1,0,0,25), BackgroundTransparency = 1, Text = "CONFIG & POSISI", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 1, Parent = ConfigPage})
+    -- ═══ ISI TAB CONFIG ═══
+    local ConfigTitle = new("TextLabel", {Size = UDim2.new(1,0,0,25), BackgroundTransparency = 1, Text = "CONFIG & POSISI", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 1, ZIndex = 431, Parent = ConfigPage})
     
     local SaveBtn, SaveLbl = makePremiumBtn(ConfigPage, "[Save] Posisi ke Slot Baru"); SaveBtn.LayoutOrder = 2
     local FindBtn, FindLbl = makePremiumBtn(ConfigPage, "[Cari] Target Terdekat"); FindBtn.LayoutOrder = 3
     
-    local PositionsList = new("ScrollingFrame", {Size = UDim2.new(1,0,0,220), BackgroundColor3 = COLOR.BG2, BorderSizePixel = 0, ScrollBarThickness = 3, LayoutOrder = 4, Parent = ConfigPage})
+    local PositionsList = new("ScrollingFrame", {Size = UDim2.new(1,0,0,220), BackgroundColor3 = COLOR.BG2, BorderSizePixel = 0, ScrollBarThickness = 3, LayoutOrder = 4, Active = true, ZIndex = 431, Parent = ConfigPage})
     corner(PositionsList, 8)
     new("UIListLayout", {SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0,6), Parent = PositionsList})
     new("UIPadding", {PaddingTop = UDim.new(0,6), PaddingBottom = UDim.new(0,6), PaddingLeft = UDim.new(0,6), PaddingRight = UDim.new(0,6), Parent = PositionsList})
     
     local function buildSlotRow(posData, index)
         if type(posData) ~= "table" or typeof(posData.pos) ~= "Vector3" then return end
-        local row = new("Frame", {Size = UDim2.new(1,0,0,45), BackgroundColor3 = COLOR.GreyDark, LayoutOrder = index, Parent = PositionsList})
+        local row = new("Frame", {Size = UDim2.new(1,0,0,45), BackgroundColor3 = COLOR.GreyDark, LayoutOrder = index, ZIndex = 432, Parent = PositionsList})
         corner(row, 6)
-        new("TextLabel", {Size = UDim2.new(1,-10,0,15), Position = UDim2.new(0,5,0,5), BackgroundTransparency = 1, Text = string.format("%s X:%d Y:%d Z:%d", posData.name or "Slot", math.floor(posData.pos.X), math.floor(posData.pos.Y), math.floor(posData.pos.Z)), TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Left, Parent = row})
-        local tpBtn = new("TextButton", {Size = UDim2.new(0.4,-4,0,18), Position = UDim2.new(0,4,0,22), BackgroundColor3 = COLOR.Black, Text = "TP Truck", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 9, Parent = row})
+        new("TextLabel", {Size = UDim2.new(1,-10,0,15), Position = UDim2.new(0,5,0,5), BackgroundTransparency = 1, Text = string.format("%s X:%d Y:%d Z:%d", posData.name or "Slot", math.floor(posData.pos.X), math.floor(posData.pos.Y), math.floor(posData.pos.Z)), TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 9, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 433, Parent = row})
+        local tpBtn = new("TextButton", {Size = UDim2.new(0.4,-4,0,18), Position = UDim2.new(0,4,0,22), BackgroundColor3 = COLOR.Black, Text = "TP Truck", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 9, Active = true, ZIndex = 433, Parent = row})
         corner(tpBtn, 4)
-        local delBtn = new("TextButton", {Size = UDim2.new(0.2,-4,0,18), Position = UDim2.new(0.8,0,0,22), BackgroundColor3 = COLOR.Error, Text = "Hapus", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 9, Parent = row})
+        local delBtn = new("TextButton", {Size = UDim2.new(0.2,-4,0,18), Position = UDim2.new(0.8,0,0,22), BackgroundColor3 = COLOR.Error, Text = "Hapus", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 9, Active = true, ZIndex = 433, Parent = row})
         corner(delBtn, 4)
-        tpBtn.MouseButton1Click:Connect(function() teleportCarToPos(posData.pos) end)
-        delBtn.MouseButton1Click:Connect(function()
+        tpBtn.Activated:Connect(function() teleportCarToPos(posData.pos) end)
+        delBtn.Activated:Connect(function()
             for i, p in ipairs(savedPositions) do if p == posData then table.remove(savedPositions, i) break end end
             markSaveDirty(); row:Destroy()
         end)
@@ -948,53 +1062,45 @@ local function startCarTool()
     end
     task.spawn(refreshPosList)
 
-    -- ═══════════════════════════════════════════════════════════════
-    -- ISI TAB SETTINGS (FLY, DESTINASI)
-    -- ═══════════════════════════════════════════════════════════════
-    local SettingsTitle = new("TextLabel", {Size = UDim2.new(1,0,0,25), BackgroundTransparency = 1, Text = "SETTINGS", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 1, Parent = SettingsPage})
+    -- ═══ ISI TAB SETTINGS ═══
+    local SettingsTitle = new("TextLabel", {Size = UDim2.new(1,0,0,25), BackgroundTransparency = 1, Text = "SETTINGS", TextColor3 = COLOR.White, Font = Enum.Font.GothamBlack, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 1, ZIndex = 431, Parent = SettingsPage})
     
     local FlyBtn, FlyLbl = makePremiumBtn(SettingsPage, "[Fly] OFF", COLOR.GreyDark, COLOR.Black); FlyBtn.LayoutOrder = 2
-    local FlySpeedRow = new("Frame", {Size = UDim2.new(1,0,0,35), BackgroundColor3 = COLOR.BG2, BorderSizePixel = 0, LayoutOrder = 3, Parent = SettingsPage})
+    local FlySpeedRow = new("Frame", {Size = UDim2.new(1,0,0,35), BackgroundColor3 = COLOR.BG2, BorderSizePixel = 0, LayoutOrder = 3, ZIndex = 431, Parent = SettingsPage})
     corner(FlySpeedRow, 8)
-    new("TextLabel", {Size = UDim2.new(0.42,0,1,0), Position = UDim2.new(0,10,0,0), BackgroundTransparency = 1, Text = "Fly Speed:", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, Parent = FlySpeedRow})
-    local FlySpeedBox = new("TextBox", {Size = UDim2.new(0.52,0,1,-8), Position = UDim2.new(0.44,0,0,4), BackgroundColor3 = COLOR.Black, Text = tostring(flySpeed), TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 12, BorderSizePixel = 0, Parent = FlySpeedRow})
+    new("TextLabel", {Size = UDim2.new(0.42,0,1,0), Position = UDim2.new(0,10,0,0), BackgroundTransparency = 1, Text = "Fly Speed:", TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 432, Parent = FlySpeedRow})
+    local FlySpeedBox = new("TextBox", {Size = UDim2.new(0.52,0,1,-8), Position = UDim2.new(0.44,0,0,4), BackgroundColor3 = COLOR.Black, Text = tostring(flySpeed), TextColor3 = COLOR.White, Font = Enum.Font.GothamBold, TextSize = 12, BorderSizePixel = 0, ZIndex = 432, Parent = FlySpeedRow})
     corner(FlySpeedBox, 6)
 
-    -- ═══════════════════════════════════════════════════════════════
-    -- LOGIKA MINIMIZE & CLOSE
-    -- ═══════════════════════════════════════════════════════════════
+    -- ═══ LOGIKA MINIMIZE & CLOSE ═══
     local isMinimized = false
     local origSize = UDim2.new(0, guiW, 0, guiH)
     local origPos = MainWrapper.Position
     
-    MinimizeBtn.MouseButton1Click:Connect(function()
+    MinimizeBtn.Activated:Connect(function()
         isMinimized = not isMinimized
         if isMinimized then
             MinimizeBtn.Text = "+"
             Sidebar.Visible = false
             Content.Visible = false
             Divider.Visible = false
-            -- Animasi ngecil ke bawah
             tween(MainWrapper, {Size = UDim2.new(0, guiW, 0, 40), Position = UDim2.new(0.5, -guiW/2, 1, -50)}, 0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out):Play()
         else
             MinimizeBtn.Text = "-"
             Sidebar.Visible = true
             Content.Visible = true
             Divider.Visible = true
-            -- Balikin ke ukuran semula
             tween(MainWrapper, {Size = origSize, Position = origPos}, 0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out):Play()
         end
     end)
 
-    CloseBtn.MouseButton1Click:Connect(function()
+    CloseBtn.Activated:Connect(function()
         if _G.BSTS_LuxxyHub_Cleanup then pcall(_G.BSTS_LuxxyHub_Cleanup) end
         ScreenGui:Destroy()
     end)
 
-    -- ═══════════════════════════════════════════════════════════════
-    -- FUNGSI TOMBOL LAINNYA
-    -- ═══════════════════════════════════════════════════════════════
-    bind(SaveBtn.MouseButton1Click, function()
+    -- ═══ FUNGSI TOMBOL LAINNYA ═══
+    bind(SaveBtn.Activated, function()
         local char = LocalPlayer.Character
         if not char then return end
         local hrp = char:FindFirstChild("HumanoidRootPart")
@@ -1006,21 +1112,21 @@ local function startCarTool()
         task.wait(1.2); SaveLbl.Text = "[Save] Posisi ke Slot Baru"
     end)
     
-    bind(FindBtn.MouseButton1Click, function()
+    bind(FindBtn.Activated, function()
         targetVehicleRoot = findNearestCar()
         if targetVehicleRoot then FindLbl.Text = targetVehicleRoot.Name; StatusLabel.Text = "Status: Target ditemukan"
         else FindLbl.Text = "Tidak ada target"; StatusLabel.Text = "Status: Tidak ada target" end
         task.wait(1.5); FindLbl.Text = "[Cari] Target Terdekat"
     end)
 
-    bind(SwitchBtn.MouseButton1Click, function()
+    bind(SwitchBtn.Activated, function()
         farmToggleActive = not farmToggleActive
         setSwitchVisual(farmToggleActive)
         if farmToggleActive then startFarm(StatusLabel) 
         else stopFarm(); StatusLabel.Text = "Status: Siap digunakan"; StatusLabel.TextColor3 = COLOR.TextDim end
     end)
     
-    bind(FlyBtn.MouseButton1Click, function()
+    bind(FlyBtn.Activated, function()
         toggleFly()
         if flyEnabled then FlyLbl.Text = "[Fly] ON"; FlyBtn.BackgroundColor3 = COLOR.White; FlyLbl.TextColor3 = COLOR.Black
         else FlyLbl.Text = "[Fly] OFF"; FlyBtn.BackgroundColor3 = COLOR.GreyDark; FlyLbl.TextColor3 = COLOR.White end
@@ -1032,17 +1138,13 @@ local function startCarTool()
         else FlySpeedBox.Text = tostring(flySpeed) end
     end)
 
-    -- Buka UI
-    MainWrapper.Visible = true
-    tween(MainWrapper, {Size = origSize}, 0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out):Play()
-
-    print("[BSTS-ID] v5.0 Sidebar Edition Ready!")
+    print("[BSTS-ID] v9.3 (New Logo) Loaded!")
 end
 
 task.spawn(function()
     if not isBSTSGame() then print("[BSTS-ID] Map tidak sesuai: " .. game.Name); return end
-    print("[BSTS-ID] Game terdeteksi. Loading v5.0...")
+    print("[BSTS-ID] Game terdeteksi. Loading v9.3...")
     startCarTool()
 end)
 
-print("[BSTS-ID - LuxxyHub] v5.0 Loaded! ✨")
+print("[BSTS-ID - LuxxyHub] v9.3 Loaded! ✨")
