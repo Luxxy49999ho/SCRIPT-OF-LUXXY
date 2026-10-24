@@ -1,7 +1,6 @@
 -- ═══════════════════════════════════════════════════════════════
--- BSTS-ID - LuxxyHub v4.3 (Mono Glossy Edition)
+-- BSTS-ID - LuxxyHub v4.3
 -- ═══════════════════════════════════════════════════════════════
-
 local CONFIG = {
     BrandName = "BSTS-ID - LuxxyHub",
     ConfigFile = "bstsid_luxxyhub_config.json",
