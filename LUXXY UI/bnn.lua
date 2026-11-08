@@ -1,224 +1,216 @@
 -- [ PROTECT BY LUXXY OBF V1 ]
 -- [ Advanced AST Mutation ]
 
-local lib, MarketplaceService, window, screenGui, mainTab, group
-local _st_f1bff8 = 1
+local _V545728, _V552755, _V391439, _V4df53e, _Vfcb87d, _V098a70
+local _st_fe4a46 = 1
 while true do
-if (_st_f1bff8 == 1) then
-lib = loadstring(game:HttpGet(""))()
-_st_f1bff8 = (2)
-elseif (_st_f1bff8 == 2) then
-MarketplaceService = game:GetService("")
-_st_f1bff8 = (3)
-elseif (_st_f1bff8 == 3) then
-getgenv().UIColor = {[""] = Color3.fromRGB(((8 * 25) + 0), ((7 * 28) + 4), ((7 * 28) + 4)), [""] = Color3.fromRGB((27 + 203), (889 + -659), ((5 * 46) + 0)), [""] = Color3.fromRGB((76 + 154), ((10 * 23) + 0), (964 + -734)), [""] = "", [""] = Color3.fromRGB((107 + 133), (262 + -22), (826 + -586)), [""] = Color3.fromRGB((-798 + 1053), ((6 * 42) + 3), (923 + -668)), [""] = Color3.fromRGB(((10 * 25) + 5), (719 + -464), ((4 * 63) + 3)), [""] = Color3.fromRGB(((3 * 85) + 0), ((8 * 31) + 7), (449 + -194)), [""] = Color3.fromRGB((-421 + 591), (-632 + 802), (490 + -320)), [""] = Color3.fromRGB((-652 + 907), ((7 * 36) + 3), (471 + -216)), [""] = Color3.fromRGB(((3 * 13) + 1), (21 + 19), ((5 * 8) + 0)), [""] = Color3.fromRGB((-228 + 278), (-739 + 789), (816 + -766)), [""] = 0.1, [""] = Color3.fromRGB((907 + -847), ((2 * 30) + 0), (797 + -737)), [""] = Color3.fromRGB(((6 * 11) + 4), ((6 * 11) + 4), ((4 * 17) + 2)), [""] = Color3.fromRGB(((5 * 51) + 0), ((4 * 63) + 3), (945 + -690)), [""] = Color3.fromRGB(((10 * 22) + 0), ((2 * 110) + 0), ((7 * 31) + 3)), [""] = Color3.fromRGB((-764 + 1019), ((10 * 25) + 5), ((3 * 85) + 0)), [""] = Color3.fromRGB(((7 * 28) + 4), ((2 * 100) + 0), (35 + 165)), [""] = Color3.fromRGB((-172 + 402), (935 + -705), (963 + -733)), [""] = Color3.fromRGB(((2 * 92) + 1), ((6 * 30) + 5), ((7 * 26) + 3)), [""] = Color3.fromRGB((-798 + 1053), ((7 * 36) + 3), (197 + 58)), [""] = Color3.fromRGB(((8 * 6) + 2), ((6 * 8) + 2), ((3 * 16) + 2)), [""] = Color3.fromRGB((321 + -91), (535 + -305), ((8 * 28) + 6)), [""] = Color3.fromRGB(((9 * 28) + 3), (-987 + 1242), (-303 + 558)), [""] = Color3.fromRGB(((3 * 66) + 2), (-900 + 1100), (-894 + 1094)), [""] = Color3.fromRGB((-518 + 773), ((7 * 36) + 3), ((10 * 25) + 5)), [""] = Color3.fromRGB(((2 * 127) + 1), (519 + -264), ((7 * 36) + 3)), [""] = Color3.fromRGB(((9 * 28) + 3), ((8 * 31) + 7), ((6 * 42) + 3)), [""] = Color3.fromRGB(((9 * 22) + 2), (964 + -764), ((5 * 40) + 0)), [""] = 0.5}
-_st_f1bff8 = (4)
-elseif (_st_f1bff8 == 4) then
-window = lib:CreateWindow({Title = "", Subtitle = "", Image = ""})
-_st_f1bff8 = (5)
-elseif (_st_f1bff8 == 5) then
-screenGui = game.CoreGui:FindFirstChild("")
-_st_f1bff8 = (6)
-elseif (_st_f1bff8 == 6) then
-local _junk_9952 = { 4, 9 }; for _k, _v in ipairs(_junk_07ec) do if _v == -1 then print(_v) end end
-_st_f1bff8 = (7)
-elseif (_st_f1bff8 == 7) then
+if (_st_fe4a46 == 1) then
+Print("")
+_st_fe4a46 = (2)
+elseif (_st_fe4a46 == 2) then
+_V545728 = loadstring(game:HttpGet(""))()
+_st_fe4a46 = (3)
+elseif (_st_fe4a46 == 3) then
+_V552755 = game:GetService("")
+_st_fe4a46 = (4)
+elseif (_st_fe4a46 == 4) then
+getgenv().UIColor = {[""] = Color3.fromRGB((-746 + 946), (175 + 25), (825 + -625)), [""] = Color3.fromRGB((-426 + 656), (791 + -561), (795 + -565)), [""] = Color3.fromRGB(((8 * 28) + 6), ((3 * 76) + 2), ((3 * 76) + 2)), [""] = "", [""] = Color3.fromRGB((459 + -219), (-698 + 938), ((4 * 60) + 0)), [""] = Color3.fromRGB((-973 + 1228), (-580 + 835), ((8 * 31) + 7)), [""] = Color3.fromRGB((-585 + 840), (981 + -726), (601 + -346)), [""] = Color3.fromRGB(((7 * 36) + 3), (-890 + 1145), ((5 * 51) + 0)), [""] = Color3.fromRGB(((10 * 17) + 0), (-383 + 553), (-745 + 915)), [""] = Color3.fromRGB((181 + 74), (-162 + 417), ((8 * 31) + 7)), [""] = Color3.fromRGB(((4 * 10) + 0), ((5 * 8) + 0), (673 + -633)), [""] = Color3.fromRGB(((6 * 8) + 2), (357 + -307), (-905 + 955)), [""] = 0.1, [""] = Color3.fromRGB((-971 + 1031), (-507 + 567), (507 + -447)), [""] = Color3.fromRGB(((9 * 7) + 7), (162 + -92), ((9 * 7) + 7)), [""] = Color3.fromRGB(((9 * 28) + 3), ((6 * 42) + 3), ((4 * 63) + 3)), [""] = Color3.fromRGB((782 + -562), ((4 * 55) + 0), ((2 * 110) + 0)), [""] = Color3.fromRGB((972 + -717), ((6 * 42) + 3), ((3 * 85) + 0)), [""] = Color3.fromRGB((-335 + 535), ((9 * 22) + 2), (919 + -719)), [""] = Color3.fromRGB((-127 + 357), ((7 * 32) + 6), (-423 + 653)), [""] = Color3.fromRGB(((8 * 23) + 1), (-997 + 1182), (820 + -635)), [""] = Color3.fromRGB((-210 + 465), ((2 * 127) + 1), ((3 * 85) + 0)), [""] = Color3.fromRGB(((4 * 12) + 2), ((6 * 8) + 2), (-51 + 101)), [""] = Color3.fromRGB(((4 * 57) + 2), (-568 + 798), ((7 * 32) + 6)), [""] = Color3.fromRGB(((7 * 36) + 3), (-339 + 594), (-763 + 1018)), [""] = Color3.fromRGB((-48 + 248), (-748 + 948), ((8 * 25) + 0)), [""] = Color3.fromRGB((-305 + 560), (973 + -718), (-351 + 606)), [""] = Color3.fromRGB(((7 * 36) + 3), (-398 + 653), (-131 + 386)), [""] = Color3.fromRGB(((8 * 31) + 7), (-892 + 1147), ((3 * 85) + 0)), [""] = Color3.fromRGB((-348 + 548), (997 + -797), (-400 + 600)), [""] = 0.5}
+_st_fe4a46 = (5)
+elseif (_st_fe4a46 == 5) then
+local _junk_1e67 = { 6, 4 }; for _k, _v in ipairs(_junk_1e67) do if _v == -1 then print(_v) end end
+_st_fe4a46 = (6)
+elseif (_st_fe4a46 == 6) then
+_V391439 = _V545728:CreateWindow({Title = "", Subtitle = "", Image = ""})
+_st_fe4a46 = (7)
+elseif (_st_fe4a46 == 7) then
+_V4df53e = game.CoreGui:FindFirstChild("")
+_st_fe4a46 = (8)
+elseif (_st_fe4a46 == 8) then
+if _V4df53e then
+local _V1ff02f
+local _st_2968a3 = 1
+while true do
+if (_st_2968a3 == 1) then
+if (math.sin(63) > 2) then while true do break end end
+_st_2968a3 = (2)
+elseif (_st_2968a3 == 2) then
+_V1ff02f = _V4df53e:FindFirstChild("")
+_st_2968a3 = (3)
+elseif (_st_2968a3 == 3) then
 if ((100 % 10) == 0) then
-if screenGui then
-local mainFrame
-local _st_77b6b0 = 1
+if _V1ff02f then
+local _V621f62
+local _st_5ecfa1 = 1
 while true do
-if (_st_77b6b0 == 1) then
-mainFrame = screenGui:FindFirstChild("")
-_st_77b6b0 = (2)
-elseif (_st_77b6b0 == 2) then
-local _junk_eae1 = { 3, 9 }; for _k, _v in ipairs(_junk_d334) do if _v == -1 then print(_v) end end
-_st_77b6b0 = (3)
-elseif (_st_77b6b0 == 3) then
-if mainFrame then
-local mainContainer
-local _st_6c014f = 1
+if (_st_5ecfa1 == 1) then
+_V621f62 = _V1ff02f:FindFirstChild("")
+_st_5ecfa1 = (2)
+elseif (_st_5ecfa1 == 2) then
+if ((3 * 4) == 12) then
+if _V621f62 then
+local _V8ad991
+local _st_fa3176 = 1
 while true do
-if (_st_6c014f == 1) then
-mainContainer = mainFrame:FindFirstChild("")
-_st_6c014f = (2)
-elseif (_st_6c014f == 2) then
-if mainContainer then
-local topMain
-local _st_5800cb = 1
-while true do
-if (_st_5800cb == 1) then
-topMain = mainContainer:FindFirstChild("")
-_st_5800cb = (2)
-elseif (_st_5800cb == 2) then
-local _junk_3e66 = { 5, 6 }; for _k, _v in ipairs(_junk_a6be) do if _v == -1 then print(_v) end end
-_st_5800cb = (3)
-elseif (_st_5800cb == 3) then
-if topMain then
-local textLabelMain, mapLabel
-local _st_d11e7e = 1
-while true do
-if (_st_d11e7e == 1) then
-textLabelMain = topMain:FindFirstChild("")
-_st_d11e7e = (2)
-elseif (_st_d11e7e == 2) then
-if textLabelMain then
-local _st_4f470c = 1
-while true do
-if (_st_4f470c == 1) then
-local _junk_3b6e = { 5, 7 }; for _k, _v in ipairs(_junk_7397) do if _v == -1 then print(_v) end end
-_st_4f470c = (2)
-elseif (_st_4f470c == 2) then
-textLabelMain.Text = ""
-_st_4f470c = (3)
-elseif (_st_4f470c == 3) then
+if (_st_fa3176 == 1) then
+local _junk_d975 = { 7, 4 }; for _k, _v in ipairs(_junk_d975) do if _v == -1 then print(_v) end end
+_st_fa3176 = (2)
+elseif (_st_fa3176 == 2) then
+_V8ad991 = _V621f62:FindFirstChild("")
+_st_fa3176 = (3)
+elseif (_st_fa3176 == 3) then
 if ((100 % 10) == 0) then
-textLabelMain.TextXAlignment = Enum.TextXAlignment.Left
+if _V8ad991 then
+local _V87d005, _V31f0a1
+local _st_b32727 = 1
+while true do
+if (_st_b32727 == 1) then
+_V87d005 = _V8ad991:FindFirstChild("")
+_st_b32727 = (2)
+elseif (_st_b32727 == 2) then
+if _V87d005 then
+local _st_22112b = 1
+while true do
+if (_st_22112b == 1) then
+_V87d005.Text = ""
+_st_22112b = (2)
+elseif (_st_22112b == 2) then
+if ((5 * 10) == 50) then
+_V87d005.TextXAlignment = Enum.TextXAlignment.Left
 end
-_st_4f470c = (4)
-elseif (_st_4f470c == 4) then
-textLabelMain.Position = UDim2.new((3 * 0), ((4 * 8) + 3), (7 * 0), (1 * 0))
-_st_4f470c = (5)
-elseif (_st_4f470c == 5) then
-textLabelMain.Size = UDim2.new((8 * 0), (-298 + 448), ((9 * 0) + 1), (7 * 0))
-_st_4f470c = (6)
-elseif (_st_4f470c == 6) then
+_st_22112b = (3)
+elseif (_st_22112b == 3) then
+if (math.sin(35) > 2) then while true do break end end
+_st_22112b = (4)
+elseif (_st_22112b == 4) then
+_V87d005.Position = UDim2.new((5 * 0), ((10 * 3) + 5), (5 * 0), (8 * 0))
+_st_22112b = (5)
+elseif (_st_22112b == 5) then
+_V87d005.Size = UDim2.new((2 * 0), (332 + -182), (-615 + 616), (2 * 0))
+_st_22112b = (6)
+elseif (_st_22112b == 6) then
 break
 end
 end
 end
-_st_d11e7e = (3)
-elseif (_st_d11e7e == 3) then
-local _junk_d722 = { 9, 5 }; for _k, _v in ipairs(_junk_f85a) do if _v == -1 then print(_v) end end
-_st_d11e7e = (4)
-elseif (_st_d11e7e == 4) then
-mapLabel = Instance.new("")
-_st_d11e7e = (5)
-elseif (_st_d11e7e == 5) then
-mapLabel.Name = ""
-_st_d11e7e = (6)
-elseif (_st_d11e7e == 6) then
-mapLabel.Parent = topMain
-_st_d11e7e = (7)
-elseif (_st_d11e7e == 7) then
-local _junk_2f6e = { 1, 9 }; for _k, _v in ipairs(_junk_49a7) do if _v == -1 then print(_v) end end
-_st_d11e7e = (8)
-elseif (_st_d11e7e == 8) then
-mapLabel.BackgroundTransparency = (-888 + 889)
-_st_d11e7e = (9)
-elseif (_st_d11e7e == 9) then
-mapLabel.Size = UDim2.new((4 * 0), (-849 + 1149), ((3 * 0) + 1), (1 * 0))
-_st_d11e7e = (10)
-elseif (_st_d11e7e == 10) then
-local _junk_5947 = { 7, 2 }; for _k, _v in ipairs(_junk_bc3a) do if _v == -1 then print(_v) end end
-_st_d11e7e = (11)
-elseif (_st_d11e7e == 11) then
-mapLabel.Position = UDim2.new(0.5, (- ((10 * 15) + 0)), (5 * 0), (5 * 0))
-_st_d11e7e = (12)
-elseif (_st_d11e7e == 12) then
+_st_b32727 = (3)
+elseif (_st_b32727 == 3) then
+if (math.sin(51) > 2) then while true do break end end
+_st_b32727 = (4)
+elseif (_st_b32727 == 4) then
+_V31f0a1 = Instance.new("")
+_st_b32727 = (5)
+elseif (_st_b32727 == 5) then
+if ((10 * 9) == 90) then
+_V31f0a1.Name = ""
+end
+_st_b32727 = (6)
+elseif (_st_b32727 == 6) then
+_V31f0a1.Parent = _V8ad991
+_st_b32727 = (7)
+elseif (_st_b32727 == 7) then
+_V31f0a1.BackgroundTransparency = (-880 + 881)
+_st_b32727 = (8)
+elseif (_st_b32727 == 8) then
 if ((100 % 10) == 0) then
-mapLabel.Font = Enum.Font.GothamBold
+_V31f0a1.Size = UDim2.new((8 * 0), (585 + -285), (-491 + 492), (6 * 0))
 end
-_st_d11e7e = (13)
-elseif (_st_d11e7e == 13) then
+_st_b32727 = (9)
+elseif (_st_b32727 == 9) then
+_V31f0a1.Position = UDim2.new(0.5, (- ((10 * 15) + 0)), (5 * 0), (7 * 0))
+_st_b32727 = (10)
+elseif (_st_b32727 == 10) then
+if ((10 * 9) == 90) then
+_V31f0a1.Font = Enum.Font.GothamBold
+end
+_st_b32727 = (11)
+elseif (_st_b32727 == 11) then
+_V31f0a1.TextSize = (-28 + 42)
+_st_b32727 = (12)
+elseif (_st_b32727 == 12) then
+do local _a = 742; local _b = 206; if _a * _b == -1 then print("dead") end end
+_st_b32727 = (13)
+elseif (_st_b32727 == 13) then
+_V31f0a1.TextColor3 = Color3.fromRGB(((6 * 42) + 3), (-859 + 1114), (778 + -523))
+_st_b32727 = (14)
+elseif (_st_b32727 == 14) then
+if (math.sin(87) > 2) then while true do break end end
+_st_b32727 = (15)
+elseif (_st_b32727 == 15) then
+if ((8 * 6) == 48) then
+_V31f0a1.TextXAlignment = Enum.TextXAlignment.Center
+end
+_st_b32727 = (16)
+elseif (_st_b32727 == 16) then
 if ((100 % 10) == 0) then
-mapLabel.TextSize = ((3 * 4) + 2)
-end
-_st_d11e7e = (14)
-elseif (_st_d11e7e == 14) then
-mapLabel.TextColor3 = Color3.fromRGB(((2 * 127) + 1), (-720 + 975), ((5 * 51) + 0))
-_st_d11e7e = (15)
-elseif (_st_d11e7e == 15) then
-local _junk_88bf = { 4, 8 }; for _k, _v in ipairs(_junk_2e6c) do if _v == -1 then print(_v) end end
-_st_d11e7e = (16)
-elseif (_st_d11e7e == 16) then
-if ((3 * 7) == 21) then
-mapLabel.TextXAlignment = Enum.TextXAlignment.Center
-end
-_st_d11e7e = (17)
-elseif (_st_d11e7e == 17) then
-task.spawn(function()
-local success, gameName
-local _st_946f85 = 1
+task.spawn((function()
+local _V87c937, _Vdae668
+local _st_8820b7 = 1
 while true do
-if (_st_946f85 == 1) then
-success, gameName = pcall(function()
-local _st_e5990a = 1
-while true do
-if (_st_e5990a == 1) then
-local _junk_2b41 = { 6, 8 }; for _k, _v in ipairs(_junk_c541) do if _v == -1 then print(_v) end end
-_st_e5990a = (2)
-elseif (_st_e5990a == 2) then
-return MarketplaceService:GetProductInfo(game.PlaceId).Name
-elseif (_st_e5990a == 3) then
-break
-end
-end
-end)
-_st_946f85 = (2)
-elseif (_st_946f85 == 2) then
-if (success and gameName) then
-local _st_3f1bae = 1
-while true do
-if (_st_3f1bae == 1) then
-local _junk_7baa = { 5, 3 }; for _k, _v in ipairs(_junk_d91b) do if _v == -1 then print(_v) end end
-_st_3f1bae = (2)
-elseif (_st_3f1bae == 2) then
-mapLabel.Text = gameName
-_st_3f1bae = (3)
-elseif (_st_3f1bae == 3) then
-break
-end
-end
+if (_st_8820b7 == 1) then
+_V87c937, _Vdae668 = pcall((function()
+return _V552755:GetProductInfo(game.PlaceId).Name
+end))
+_st_8820b7 = (2)
+elseif (_st_8820b7 == 2) then
+do local _a = 463; local _b = 865; if _a * _b == -1 then print("dead") end end
+_st_8820b7 = (3)
+elseif (_st_8820b7 == 3) then
+if (_V87c937 and _Vdae668) then
+_V31f0a1.Text = _Vdae668
 elseif  then
-mapLabel.Text = game.Name
+_V31f0a1.Text = game.Name
 end
-_st_946f85 = (3)
-elseif (_st_946f85 == 3) then
+_st_8820b7 = (4)
+elseif (_st_8820b7 == 4) then
 break
 end
 end
-end)
-_st_d11e7e = (18)
-elseif (_st_d11e7e == 18) then
-break
+end))
 end
-end
-end
-_st_5800cb = (4)
-elseif (_st_5800cb == 4) then
-break
-end
-end
-end
-_st_6c014f = (3)
-elseif (_st_6c014f == 3) then
-break
-end
-end
-end
-_st_77b6b0 = (4)
-elseif (_st_77b6b0 == 4) then
+_st_b32727 = (17)
+elseif (_st_b32727 == 17) then
 break
 end
 end
 end
 end
-_st_f1bff8 = (8)
-elseif (_st_f1bff8 == 8) then
-mainTab = window:AddTab("")
-_st_f1bff8 = (9)
-elseif (_st_f1bff8 == 9) then
-group = mainTab:AddLeftGroupbox("")
-_st_f1bff8 = (10)
-elseif (_st_f1bff8 == 10) then
-group:AddToggle("", {Text = "", Default = false, Callback = function(value)
-if ((10 * 3) == 30) then
-print("", value)
+_st_fa3176 = (4)
+elseif (_st_fa3176 == 4) then
+break
 end
-end})
-_st_f1bff8 = (11)
-elseif (_st_f1bff8 == 11) then
+end
+end
+end
+_st_5ecfa1 = (3)
+elseif (_st_5ecfa1 == 3) then
+break
+end
+end
+end
+end
+_st_2968a3 = (4)
+elseif (_st_2968a3 == 4) then
+break
+end
+end
+end
+_st_fe4a46 = (9)
+elseif (_st_fe4a46 == 9) then
+_Vfcb87d = _V391439:AddTab("")
+_st_fe4a46 = (10)
+elseif (_st_fe4a46 == 10) then
+_V098a70 = _Vfcb87d:AddLeftGroupbox("")
+_st_fe4a46 = (11)
+elseif (_st_fe4a46 == 11) then
+if ((100 % 10) == 0) then
+_V098a70:AddToggle("", {Text = "", Default = false, Callback = (function(_V1b95e3)
+if ((100 % 10) == 0) then
+print("", _V1b95e3)
+end
+end)})
+end
+_st_fe4a46 = (12)
+elseif (_st_fe4a46 == 12) then
 break
 end
 end
